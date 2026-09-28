@@ -314,6 +314,15 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(-
 .ncard{border:1px solid var(--line);border-radius:16px;background:var(--surface);padding:14px 14px 12px}
 .ncard b{display:block;font-size:15px;margin-bottom:4px}
 .ncard p{margin:0;font-size:13.5px;line-height:1.5;color:var(--ink)}
+.ncard.sup{display:flex;flex-direction:column;gap:8px}
+.sup-h{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.sup-h b{margin:0}
+.stag{flex-shrink:0;font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;padding:4px 8px;border-radius:8px;font-weight:600;white-space:nowrap}
+.stag.ok{background:var(--green-deep);color:var(--mint)}
+.stag.opt{background:var(--paper2);color:var(--ink)}
+.stag.no{background:#F1E0DA;color:#8A4A35}
+.sup-row{display:grid;grid-template-columns:62px minmax(0,1fr);gap:8px;font-size:13px;line-height:1.4}
+.sup-row .eyebrow{font-size:9.5px;color:var(--green);padding-top:2px}
 .rrow{width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;text-align:left;background:none;border:none;border-top:1px solid var(--line);padding:11px 2px;min-height:56px}
 .rrow .nm{font-size:15px;font-weight:600;line-height:1.25}
 .rrow .mu{font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-top:3px}
@@ -1550,6 +1559,21 @@ var NUTRI = {
       {t:"Álcool", b:"Trava a queima de gordura enquanto o corpo o processa e piora o sono. Se beberes, planeia: 1 a 2 copos, água pelo meio, e não num dia de treino pesado."}
     ]}
   ],
+  supplements: [
+    {t:"Whey (proteína em pó)", tag:"Prático", lvl:"ok", dose:"1 scoop (25–30 g de proteína)", when:"Nos 60 min depois do treino, ou em qualquer refeição em que falte proteína (pequeno-almoço, snack).", b:"Não é obrigatória: é só uma forma rápida de chegar aos 100–115 g de proteína por dia. Whey isolada digere melhor se o leite te cair mal. Sem whey: iogurte grego, skyr ou ovos fazem o mesmo trabalho."},
+    {t:"Creatina monohidratada", tag:"Vale a pena", lvl:"ok", dose:"3 a 5 g por dia, todos os dias (não é preciso fase de carga)", when:"A qualquer hora, sempre à mesma. Mais fácil misturada no batido pós-treino ou no iogurte.", b:"É o suplemento com mais evidência para força, potência e recuperação, e ajuda também a concentração. Pode subir 0,5 a 1 kg na balança nas primeiras semanas (é água dentro do músculo, não gordura). Bebe água suficiente. Efeito demora 2 a 4 semanas a notar."},
+    {t:"Cafeína", tag:"Vale a pena", lvl:"ok", dose:"1 café (60–100 mg) a 2 cafés antes do treino; máximo 200 mg de uma vez", when:"30 a 60 minutos antes do treino. Nunca depois das 15–16h, para não estragar o sono.", b:"Melhora energia, foco e tolerância ao esforço nos WODs e nos treinos pesados. Um expresso chega; não precisas de pré-treino em pó. Se ficares nervosa ou com o coração acelerado, reduz."},
+    {t:"Vitamina D3", tag:"Vale a pena no inverno", lvl:"ok", dose:"1000 a 2000 UI por dia", when:"De manhã, com uma refeição que tenha gordura (absorve melhor).", b:"Entre outubro e março a maioria das pessoas em Portugal fica abaixo do ideal, e a vitamina D pesa na força, na imunidade e no humor. Pede à médica para medir nas análises: se estiver bem, não precisas."},
+    {t:"Ómega-3 (EPA/DHA)", tag:"Opcional", lvl:"opt", dose:"1 a 2 g de EPA+DHA por dia (vê o rótulo: não é o peso da cápsula)", when:"Com uma refeição principal, para não repetir.", b:"Só faz falta se comeres peixe gordo (salmão, sardinha, cavala) menos de 2 vezes por semana. Ajuda à recuperação e à saúde cardiovascular. Guarda no frigorífico."},
+    {t:"Magnésio", tag:"Opcional", lvl:"opt", dose:"200 a 400 mg (bisglicinato ou citrato; evita óxido, que absorve mal)", when:"À noite, 30 a 60 min antes de deitar.", b:"Pode ajudar em cãibras, sono e recuperação, sobretudo com muito treino e pouca fruta, legumes e frutos secos. Se comeres bem disso tudo, provavelmente não precisas."},
+    {t:"Eletrólitos", tag:"Só em dias específicos", lvl:"opt", dose:"1 saqueta ou 1/4 de colher de chá de sal em 500 ml de água", when:"Em treinos longos (mais de 60–75 min) com muito suor, ou em dias de calor.", b:"Para treinos de 40 minutos com ar condicionado, água chega. Não precisas de bebidas isotónicas com açúcar."},
+    {t:"Multivitamínico", tag:"Opcional", lvl:"opt", dose:"1 por dia, dose baixa", when:"Com o pequeno-almoço.", b:"Uma rede de segurança em fases de défice calórico, quando se come menos volume. Não substitui legumes e fruta. Escolhe um com ferro só se as análises mostrarem falta."},
+    {t:"Colagénio", tag:"Pouca evidência", lvl:"no", dose:"10–15 g com vitamina C", when:"30–60 min antes do treino, se quiseres experimentar.", b:"Há alguma evidência para tendões e articulações, pouca para pele. Não é prioridade: com a proteína diária bem feita, o corpo tem o que precisa."},
+    {t:"BCAAs e glutamina", tag:"Não precisas", lvl:"no", dose:"—", when:"—", b:"Se a proteína diária estiver no sítio, os BCAAs já lá estão. É dinheiro deitado fora."},
+    {t:"Queimadores de gordura", tag:"Não", lvl:"no", dose:"—", when:"—", b:"Ou é cafeína cara, ou é coisa que não funciona, ou faz mal. A gordura perde-se com o défice, a proteína e o treino. Nenhuma cápsula muda isso."},
+    {t:"Pré-treinos em pó", tag:"Não precisas", lvl:"no", dose:"—", when:"—", b:"São cafeína (muitas vezes 200–300 mg, demasiado) com corantes e beta-alanina, que dá formigueiro. Um café e uma banana fazem o mesmo. Se ainda assim quiseres, meia dose e nunca depois das 15h."}
+  ],
+  supNote: "Se estiveres grávida, a amamentar, a tomar medicação ou tiveres alguma condição de saúde, valida com a médica antes de começar qualquer suplemento. Compra marcas com testes de terceiros (Informed Sport, NSF, Cologne List).",
   meals: [["pa","Pequeno-almoço"],["al","Almoço"],["ja","Jantar"],["sn","Snack"],["pos","Pós-treino"],["doce","Doce saudável"]],
   recipes: [
     {n:"Papas de aveia proteicas", m:"pa", min:8, kcal:380, prot:30, ing:["50 g de aveia","200 ml de leite ou bebida vegetal","1 scoop de whey (30 g) ou 150 g de iogurte grego","1 banana ou punhado de frutos vermelhos","canela"], st:["Cozinha a aveia com o leite em lume brando 4 a 5 minutos, a mexer.","Tira do lume, deixa arrefecer 1 minuto e mistura a whey (se puseres com o lume ligado fica grumosa).","Cobre com fruta e canela."], tip:"Faz de véspera com iogurte em vez de cozinhar: aveia + iogurte + leite no frigorífico (overnight oats)."},
@@ -2080,8 +2104,17 @@ function renderNutri(){
   h += '<p class="note" style="margin:10px 2px 0">' + esc(NUTRI.intro) + '</p>';
   h += '<div class="chips" role="group" aria-label="Secção">';
   NUTRI.sections.forEach(function(sc){ h += '<button class="chip" data-nsec="' + sc.key + '" aria-pressed="' + (ui.nsec === sc.key) + '">' + esc(sc.name) + '</button>'; });
+  h += '<button class="chip" data-nsec="sup" aria-pressed="' + (ui.nsec === "sup") + '">Suplementos</button>';
   h += '<button class="chip" data-nsec="rec" aria-pressed="' + (ui.nsec === "rec") + '">Receitas</button></div>';
-  if (ui.nsec === "rec"){
+  if (ui.nsec === "sup"){
+    h += '<p class="note" style="margin:10px 2px 0">O que vale a pena, quanto e quando. O resto da lista é para não gastares dinheiro à toa.</p><div class="ncards">';
+    NUTRI.supplements.forEach(function(sp){
+      h += '<div class="ncard sup"><div class="sup-h"><b>' + esc(sp.t) + '</b><span class="stag ' + sp.lvl + '">' + esc(sp.tag) + '</span></div>';
+      if (sp.dose !== "—") h += '<div class="sup-row"><span class="eyebrow">Quanto</span><span>' + esc(sp.dose) + '</span></div><div class="sup-row"><span class="eyebrow">Quando</span><span>' + esc(sp.when) + '</span></div>';
+      h += '<p>' + esc(sp.b) + '</p></div>';
+    });
+    h += '</div><div class="rtip" style="margin-top:12px"><b>Atenção:</b> ' + esc(NUTRI.supNote) + '</div>';
+  } else if (ui.nsec === "rec"){
     h += '<input id="nSearch" class="search" type="search" placeholder="Procurar receita ou ingrediente" value="' + esc(ui.nq) + '">';
     h += '<div class="chips" role="group" aria-label="Refeição">';
     NUTRI.meals.forEach(function(m){ h += '<button class="chip" data-nmeal="' + m[0] + '" aria-pressed="' + (ui.nmeal === m[0]) + '">' + esc(m[1]) + '</button>'; });
