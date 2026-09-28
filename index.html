@@ -268,6 +268,26 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(-
 .rounds .step{width:52px;height:52px;font-size:26px;border-radius:14px}
 .wod-note{margin:0;font-size:13px;line-height:1.45;color:var(--nsoft)}
 
+/* editor */
+.tcard.new{border:1.5px dashed var(--green);background:transparent}
+.tcard.new .nm{color:var(--green)}
+.ed-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.ed-row{border:1px solid var(--line);border-radius:14px;background:var(--surface);padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+.ed-top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.ed-n b{display:block;font-size:14px;line-height:1.25}
+.ed-n small{display:block;font-size:11.5px;color:var(--muted)}
+.ed-btns{display:flex;gap:4px;flex-shrink:0}
+.ib.sm{width:34px;height:34px;border-radius:9px;background:var(--paper2);font-size:15px;font-weight:700}
+.ib.sm.del{color:#8A5520}
+.ed-ctl{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.ed-ctl label{display:flex;flex-direction:column;gap:3px;min-width:0}
+.ed-ctl label span{font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.ed-ctl select,.ed-ctl input{min-height:40px;border:1px solid var(--line);border-radius:9px;background:var(--paper);color:var(--ink);font-family:var(--mono);font-size:13px;padding:0 8px;width:100%;min-width:0}
+.ed-opts{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.ed-res{max-height:46vh;overflow-y:auto;border-top:1px solid var(--line);margin-top:6px}
+.ed-save{position:sticky;bottom:-24px;background:var(--paper);padding:12px 0 8px;margin-top:12px;display:flex;gap:8px;align-items:center;border-top:1px solid var(--line)}
+.ed-save .main-btn{min-height:50px}
+
 /* sheet */
 .sheet{position:fixed;inset:0;z-index:40;background:rgba(14,23,18,.55);display:flex;align-items:flex-end;justify-content:center}
 .sheet .pan{width:100%;max-width:480px;max-height:92vh;overflow-y:auto;background:var(--paper);border-radius:22px 22px 0 0;padding:14px 18px calc(24px + env(safe-area-inset-bottom,0px))}
@@ -1460,13 +1480,14 @@ function fig(name, extraClass){
 
 /* ---------- state ---------- */
 var KEY = "dfc1";
-var st = {loc:"gym", type:"legs", dur:"long", ver:{}, weights:{}, last:{}, sess:null, log:[], sound:false, keepAwake:true, ssMode:"alt"};
+var st = {loc:"gym", type:"legs", dur:"long", ver:{}, weights:{}, last:{}, sess:null, log:[], sound:false, keepAwake:true, ssMode:"alt", custom:{}};
 var ui = {tab:"home", filter:null, libLoc:null, search:"", rest:null, viewDone:null, confirmEnd:false};
 try {
   var saved = JSON.parse(localStorage.getItem(KEY) || "null");
   if (saved){
     if (LOCS[saved.loc]) st.loc = saved.loc;
-    if (TYPES[saved.type]) st.type = saved.type;
+    st.custom = saved.custom || {};
+    if (typeOf(saved.type)) st.type = saved.type;
     if (saved.dur === "short" || saved.dur === "long") st.dur = saved.dur;
     st.ver = saved.ver || {}; st.weights = saved.weights || {}; st.last = saved.last || {}; st.sess = saved.sess || null; st.log = saved.log || [];
     st.sound = saved.sound === true; st.keepAwake = saved.keepAwake !== false; st.ssMode = saved.ssMode || "alt";
@@ -1491,8 +1512,8 @@ function importData(file){
     try {
       var j = JSON.parse(r.result), d = j && j.data ? j.data : j;
       if (!d || !d.weights){ toast("Ficheiro não reconhecido"); return; }
-      st.weights = d.weights || {}; st.last = d.last || {}; st.log = d.log || []; st.ver = d.ver || {};
-      if (LOCS[d.loc]) st.loc = d.loc; if (TYPES[d.type]) st.type = d.type;
+      st.weights = d.weights || {}; st.last = d.last || {}; st.log = d.log || []; st.ver = d.ver || {}; st.custom = d.custom || {};
+      if (LOCS[d.loc]) st.loc = d.loc; if (typeOf(d.type)) st.type = d.type;
       st.sess = null; save(); renderHome(); toast("Cópia importada: " + st.log.length + " treinos");
     } catch(e){ toast("Não consegui ler o ficheiro"); }
   };
@@ -1520,8 +1541,9 @@ function parseRest(r){
   return {between:0, after:0, has:false};
 }
 function blockCode(n){
-  if (/Supersérie B/.test(n)) return "B";
+  var sm = /Supersérie ([A-Z])/.exec(n); if (sm) return sm[1];
   if (/Supersérie/.test(n)) return "A";
+  if (/^Treino/.test(n)) return "T";
   if (/^Aquec/.test(n)) return "AQ";
   if (/^Along/.test(n)) return "AL";
   if (/^Core · Bloco 1/.test(n)) return "C";
@@ -1531,8 +1553,8 @@ function blockCode(n){
   return "W";
 }
 function isWod(b){ return !!(b && b.wod); }
-function blockColor(b){ var n = b.name; return /^Força|^Core/.test(n) ? "#EEF1E8" : (isWod(b) || /^Cardio · (?!Arref)/.test(n) ? "#9FD2B0" : "#6E8F7A"); }
-function blockLabel(b){ var n = b.name; if (/^Força/.test(n)) return "Força"; if (/^Core/.test(n)) return "Core"; if (isWod(b)) return wodLabel(b); if (/^Aquec/.test(n)) return "Aquecer"; if (/^Along/.test(n)) return "Alongar"; if (/^Cardio/.test(n)) return "Cardio"; return "Bloco"; }
+function blockColor(b){ var n = b.name; return /^Força|^Core|^Treino/.test(n) ? "#EEF1E8" : (isWod(b) || /^Cardio · (?!Arref)/.test(n) ? "#9FD2B0" : "#6E8F7A"); }
+function blockLabel(b){ var n = b.name; if (/^Força|^Treino/.test(n)) return "Força"; if (/^Core/.test(n)) return "Core"; if (isWod(b)) return wodLabel(b); if (/^Aquec/.test(n)) return "Aquecer"; if (/^Along/.test(n)) return "Alongar"; if (/^Cardio/.test(n)) return "Cardio"; return "Bloco"; }
 function wodLabel(b){ var w = b.wod; return w.kind === "amrap" ? "AMRAP" : (w.kind === "emom" ? "EMOM" : (w.kind === "fortime" ? "For Time" : "Circuito")); }
 function wodTotal(b){ var w = b.wod; if (w.kind === "amrap" || w.kind === "emom") return w.min * 60; if (w.kind === "fortime") return w.cap * 60; return w.rounds * b.items.length * (w.work + w.rest); }
 function wodTitle(b){ var w = b.wod; if (w.kind === "amrap") return "AMRAP " + w.min + "′"; if (w.kind === "emom") return "EMOM " + w.min + "′"; if (w.kind === "fortime") return w.rounds + " rondas · For Time (cap " + w.cap + "′)"; return w.rounds + " voltas · " + w.work + "s / " + w.rest + "s"; }
@@ -1559,8 +1581,29 @@ function blockMinutes(b){
   }
   return Math.max(1, Math.round(secs / 60));
 }
+var CUSTOM_WARM = [["cardio_warm","3 min",2],["Ponte Glúteos (c/ Elástico nos joelhos)","1×12",2],["Alongamento do Mundo (World's Greatest)","1×5/lado",1]];
+var CUSTOM_STRETCH = [["st_hams","1×30s/lado",1],["st_chest","1×30s/lado",1],["Alongamento Flexores da Anca","1×30s/lado",1]];
+function isCustomKey(k){ return typeof k === "string" && k.indexOf("custom:") === 0; }
+function typeOf(key){
+  if (TYPES[key]) return TYPES[key];
+  if (!isCustomKey(key)) return null;
+  var c = st.custom && st.custom[key.slice(7)]; if (!c) return null;
+  var blocks = [];
+  if (c.warm !== false) blocks.push({name:AQ, rest:"seguido", items:CUSTOM_WARM});
+  var items = (c.items || []).map(function(it){ return [it[0], it[1] || "3×10", it[2] || 7, it[3] || ""]; });
+  var rest = (c.rest || 60) + "s";
+  if (c.ss && items.length >= 2){
+    var L = "ABCDEFGHIJ", li = 0;
+    for (var i = 0; i < items.length; i += 2){
+      if (i + 1 < items.length){ var Lt = L.charAt(li++); blocks.push({name:"Força · Supersérie " + Lt, rest:Lt + "1 → 30s → " + Lt + "2 → " + rest, items:[items[i], items[i + 1]]}); }
+      else blocks.push({name:"Treino · " + (i + 1), rest:rest, items:[items[i]]});
+    }
+  } else if (items.length) blocks.push({name:"Treino", rest:rest, items:items});
+  if (c.stretch !== false) blocks.push({name:AL, rest:"respira fundo", items:CUSTOM_STRETCH});
+  return {name:c.name || "O meu treino", focus:"Treino criado pela Diana", kind:"custom", custom:true, noDuration:true, versions:[{blocks:blocks}]};
+}
 function resolveDay(typeKey, ver, loc, dur){
-  var t = TYPES[typeKey], v = t.versions[ver % t.versions.length], short = dur === "short" && !t.noDuration;
+  var t = typeOf(typeKey), v = t.versions[ver % t.versions.length], short = dur === "short" && !t.noDuration;
   var blocks = [];
   v.blocks.forEach(function(b){
     if (short && b.short === false) return;
@@ -1570,12 +1613,12 @@ function resolveDay(typeKey, ver, loc, dur){
       if (b.short.items) nb.items = b.short.items;
       if (b.short.wod) nb.wod = Object.assign({}, b.short.wod);
     }
-    nb.items = nb.items.map(function(it){ return resolveItem(it, loc); });
+    nb.items = nb.items.map(function(it){ var r = resolveItem(it, loc); if (it.length > 3 && it[3]) r[3] = it[3]; return r; });
     nb.min = blockMinutes(nb);
     blocks.push(nb);
   });
   var min = 0; blocks.forEach(function(b){ min += b.min; });
-  var vl = "ABC".charAt(ver % t.versions.length);
+  var vl = t.custom ? "meu" : "ABC".charAt(ver % t.versions.length);
   return {key:typeKey, ver:ver % t.versions.length, verLabel:vl, title:t.name, focus:t.focus, kind:t.kind, min:min, blocks:blocks, loc:loc, dur:dur, noDuration:!!t.noDuration};
 }
 function curVer(typeKey){ return st.ver[typeKey] || 0; }
@@ -1711,7 +1754,8 @@ function previewRows(day){
 }
 
 function renderHome(){
-  var day = curDay(), t = TYPES[st.type];
+  if (!typeOf(st.type)) st.type = "legs";
+  var day = curDay(), t = typeOf(st.type);
   var h = '<div class="wrap">';
   h += '<div class="top"><span class="eyebrow">Diana Fit Coach</span><span class="mono" style="font-size:11px;color:var(--muted)">' + esc(todayLabel()) + '</span></div>';
 
@@ -1730,12 +1774,20 @@ function renderHome(){
     h += '<button class="tcard' + (k === sug && k !== st.type ? ' sug' : '') + '" data-type="' + k + '" aria-pressed="' + (st.type === k) + '"><span><span class="nm">' + esc(tt.name) + '</span><div class="fo">' + esc(keyExercises(d)) + '</div></span><span class="mt"><span>' + (l ? esc(daysAgo(l.date)) : (k === sug ? '<b>sugestão</b>' : 'nunca')) + '</span><span>' + d.min + '′</span></span></button>';
   });
   h += '</div>';
+  var cids = Object.keys(st.custom || {});
+  h += '<div class="step-h"><h2>Os teus treinos</h2><span class="eyebrow">criados por ti</span></div><div class="tgrid">';
+  cids.forEach(function(id){
+    var k = "custom:" + id, c = st.custom[id], l = lastOfType(k), d = resolveDay(k, 0, st.loc, st.dur);
+    h += '<button class="tcard" data-type="' + k + '" aria-pressed="' + (st.type === k) + '"><span><span class="nm">' + esc(c.name || "O meu treino") + '</span><div class="fo">' + esc(keyExercises(d) || "sem exercícios") + '</div></span><span class="mt"><span>' + (l ? esc(daysAgo(l.date)) : (c.items || []).length + ' exerc.') + '</span><span>' + d.min + '′</span></span></button>';
+  });
+  h += '<button class="tcard new" id="newCustom"><span><span class="nm">+ Criar treino</span><div class="fo">Escolhe os exercícios, séries e esforço</div></span><span class="mt"><span>o teu</span></span></button>';
+  h += '</div>';
 
   var inProg = st.sess && !st.sess.finished;
   h += '<div class="hero">' + HERO_BG;
   h += '<div><div class="eyebrow" style="color:var(--mint)">' + esc(LOCS[st.loc].name) + ' · versão ' + day.verLabel + '</div>';
   h += '<div class="disp t" style="margin-top:6px">' + esc(day.title) + '</div>';
-  h += '<div class="meta">' + day.min + ' min · ' + countItems(day) + ' exercícios · esforço até ' + effortMax(day) + '/10</div></div>';
+  h += '<div class="meta">' + day.min + ' min · ' + countItems(day) + ' exercícios · esforço até ' + effortMax(day) + '/10</div>' + (t.custom ? '<button class="tech" id="editCustom" style="margin-top:10px;border-color:rgba(255,255,255,.3);color:var(--chalk)">Editar este treino</button>' : '') + '</div>';
   if (!day.noDuration){
     var dl = resolveDay(st.type, curVer(st.type), st.loc, "long"), ds = resolveDay(st.type, curVer(st.type), st.loc, "short");
     h += '<div class="dur" role="group" aria-label="Duração"><button data-dur="short" aria-pressed="' + (st.dur === "short") + '">Curto<span>' + ds.min + ' min</span></button><button data-dur="long" aria-pressed="' + (st.dur === "long") + '">Longo<span>' + dl.min + ' min</span></button></div>';
@@ -1780,6 +1832,8 @@ function renderHome(){
   var db = document.getElementById("dropBtn"); if (db) db.addEventListener("click", function(){ st.sess = null; ui.rest = null; save(); renderHome(); toast("Treino descartado"); });
   el.querySelectorAll("[data-log]").forEach(function(b){ b.addEventListener("click", function(){ openLog(parseInt(b.getAttribute("data-log"), 10)); }); });
   document.getElementById("expBtn").addEventListener("click", exportData);
+  document.getElementById("newCustom").addEventListener("click", function(){ openEditor(null); });
+  var ec = document.getElementById("editCustom"); if (ec) ec.addEventListener("click", function(){ openEditor(st.type.slice(7)); });
   document.getElementById("impBtn").addEventListener("click", function(){ document.getElementById("importFile").click(); });
 }
 document.getElementById("importFile").addEventListener("change", function(e){ var f = e.target.files && e.target.files[0]; if (f) importData(f); e.target.value = ""; });
@@ -1873,6 +1927,106 @@ function openLog(i){
   });
   h += '</div></div>';
   showSheet(h);
+}
+/* ---------- EDITOR de treinos ---------- */
+var ZONES = [["perna","Pernas"],["gluteo","Glúteos"],["costas","Costas"],["peito","Peito"],["ombros","Ombros"],["bicep","Bíceps"],["tricep","Tríceps"],["core","Core"],["cardio","Cardio"],["mobilidade","Alongar"]];
+var SCHEMES = ["3×8","3×10","3×12","3×15","4×8","4×10","4×12","2×12","2×15","3×20","3×30s","3×45s","3×60s","3×10/lado","3×12/lado","3×30s/lado","1×10","1×15","1×3 min","1×5 min"];
+function openEditor(id){
+  var c = id && st.custom[id] ? JSON.parse(JSON.stringify(st.custom[id])) : {name:"", items:[], ss:true, rest:60, warm:true, stretch:true};
+  ui.ed = {id:id || ("c" + Date.now().toString(36)), isNew:!id, c:c, q:"", zone:null, loc:st.loc, free:{}, confirmDel:false};
+  renderEditor();
+}
+function edSearchRows(){
+  var ed = ui.ed, q = ed.q.trim().toLowerCase(), rows = [];
+  LIB.forEach(function(g){
+    var gl = GROUP_LOC[g.g] || LOC_ORDER;
+    if (!q && gl.indexOf(ed.loc) < 0) return;
+    g.items.forEach(function(it){
+      var en = (EX_EN[it[0]] || "").toLowerCase();
+      if (ed.zone && it[1].indexOf(ed.zone) < 0) return;
+      if (!q || it[0].toLowerCase().indexOf(q) !== -1 || en.indexOf(q) !== -1 || it[1].indexOf(q) !== -1) rows.push(it);
+    });
+  });
+  return rows.slice(0, q ? 40 : 200);
+}
+function renderEditor(){
+  var ed = ui.ed, c = ed.c;
+  var h = '<div class="pan light" role="dialog" aria-modal="true" aria-label="Criar treino">';
+  h += '<div class="grab"><span class="eyebrow" style="color:var(--muted)">' + (ed.isNew ? "Novo treino" : "Editar treino") + '</span>' + CLOSE_BTN + '</div>';
+  h += '<label class="eyebrow" style="display:block;margin-top:12px;color:var(--muted)">Nome do treino</label><input id="edName" class="search" style="margin-top:6px" type="text" placeholder="ex.: Pernas da Diana" value="' + esc(c.name) + '">';
+  h += '<div class="eyebrow" style="margin-top:16px;color:var(--muted)">Exercícios · ' + c.items.length + '</div><div class="ed-list">';
+  if (!c.items.length) h += '<p class="note" style="margin:8px 0">Ainda não há exercícios. Procura em baixo e toca para adicionar.</p>';
+  c.items.forEach(function(it, i){
+    var isTime = /s\b|min/.test(it[1] || "");
+    h += '<div class="ed-row"><div class="ed-top"><span class="ed-n"><b>' + esc(enName(it[0])) + '</b><small>' + esc(ptName(it[0])) + '</small></span><span class="ed-btns"><button class="ib sm" data-up="' + i + '" aria-label="Subir">↑</button><button class="ib sm" data-down="' + i + '" aria-label="Descer">↓</button><button class="ib sm del" data-del="' + i + '" aria-label="Remover">✕</button></span></div>';
+    h += '<div class="ed-ctl"><label><span>Séries × reps / tempo</span>';
+    if (ed.free[i]) h += '<input type="text" data-schfree="' + i + '" placeholder="ex.: 3×12 ou 2×40s" value="' + esc(it[1]) + '">';
+    else {
+      h += '<select data-sch="' + i + '">';
+      var list = SCHEMES.slice(); if (list.indexOf(it[1]) < 0) list.unshift(it[1]);
+      list.forEach(function(sc){ h += '<option value="' + esc(sc) + '"' + (sc === it[1] ? ' selected' : '') + '>' + esc(sc) + '</option>'; });
+      h += '<option value="__free">Escrever…</option></select>';
+    }
+    h += '</label><label><span>Esforço</span><select data-eff="' + i + '">';
+    [4,5,6,7,8,9].forEach(function(e){ h += '<option value="' + e + '"' + (e === (it[2] || 7) ? ' selected' : '') + '>' + e + '/10</option>'; });
+    h += '</select></label><label><span>Peso ref.</span><input type="text" inputmode="decimal" data-kg="' + i + '" placeholder="—" value="' + esc(it[3] ? String(it[3]).replace(/\s*kg.*$/, "") : "") + '"></label></div></div>';
+  });
+  h += '</div>';
+  h += '<div class="ed-opts">';
+  h += '<button class="chip" data-opt="ss" aria-pressed="' + !!c.ss + '">Superséries 2 a 2</button>';
+  [45,60,90].forEach(function(r){ h += '<button class="chip" data-rest="' + r + '" aria-pressed="' + ((c.rest || 60) === r) + '">Descanso ' + r + 's</button>'; });
+  h += '<button class="chip" data-opt="warm" aria-pressed="' + (c.warm !== false) + '">Aquecimento automático</button><button class="chip" data-opt="stretch" aria-pressed="' + (c.stretch !== false) + '">Alongamentos automáticos</button></div>';
+  h += '<div class="eyebrow" style="margin-top:18px;color:var(--muted)">Sugestões por zona · ' + esc(LOCS[ed.loc].name) + '</div><div class="chips">';
+  ZONES.forEach(function(z){ h += '<button class="chip" data-zone="' + z[0] + '" aria-pressed="' + (ed.zone === z[0]) + '">' + z[1] + '</button>'; });
+  h += '</div>';
+  h += '<div class="eyebrow" style="margin-top:14px;color:var(--muted)">Ou procurar</div>';
+  h += '<input id="edSearch" class="search" style="margin-top:6px" type="search" placeholder="Procurar em português ou inglês" value="' + esc(ed.q) + '">';
+  h += '<div class="chips">';
+  LOC_ORDER.forEach(function(k){ h += '<button class="chip" data-edloc="' + k + '" aria-pressed="' + (ed.loc === k) + '">' + esc(LOCS[k].name) + '</button>'; });
+  h += '</div><div class="ed-res">';
+  var rows = edSearchRows(), lastG = null;
+  rows.forEach(function(it){
+    var g = (EX[it[0]] || {}).g || "";
+    if (g !== lastG){ lastG = g; h += '<div class="eyebrow" style="color:var(--muted);margin:10px 0 4px;font-size:10px">' + esc(g) + '</div>'; }
+    var f = fig(it[0], "light"), added = c.items.some(function(x){ return x[0] === it[0]; });
+    h += '<button class="lrow" data-add="' + esc(it[0]) + '">' + (f ? '<span class="thumb">' + f + '</span>' : '<span class="thumb none">' + esc(GSHORT[g] || g) + '</span>') + '<span><div class="nm">' + esc(enName(it[0])) + (added ? ' <span class="mu" style="color:var(--green)">✓ adicionado</span>' : '') + '</div><div class="en">' + esc(ptName(it[0])) + ' <span class="mu">· ' + esc(it[1]) + '</span></div></span></button>';
+  });
+  if (!rows.length) h += '<p class="empty">Nenhum exercício com esse nome.</p>';
+  h += '</div>';
+  h += '<div class="ed-save"><button class="main-btn" id="edSave" style="background:var(--green);color:var(--chalk)">Guardar treino</button>';
+  if (!ed.isNew) h += ed.confirmDel ? '<button class="tech" id="edDelYes" style="color:#8A5520;border-color:#8A5520">Apagar mesmo</button>' : '<button class="tech" id="edDel">Apagar treino</button>';
+  h += '</div></div>';
+  var el = document.getElementById("sheet"), keepPos = null, active = document.activeElement && document.activeElement.id;
+  var scrollTop = el.firstElementChild ? el.firstElementChild.scrollTop : 0;
+  if (active === "edSearch"){ try { keepPos = document.activeElement.selectionStart; } catch(e){} }
+  el.innerHTML = h; el.hidden = false;
+  var pan = el.firstElementChild; pan.scrollTop = scrollTop;
+  document.getElementById("sheetClose").addEventListener("click", function(){ ui.ed = null; closeSheet(); });
+  el.onclick = function(e){ if (e.target === el){ ui.ed = null; closeSheet(); } };
+  var nm = document.getElementById("edName"); nm.addEventListener("input", function(){ c.name = nm.value; });
+  var sq = document.getElementById("edSearch");
+  sq.addEventListener("input", function(){ ed.q = sq.value; if (ed.q) ed.zone = null; var pos = sq.selectionStart; renderEditor(); var n = document.getElementById("edSearch"); n.focus(); try { n.setSelectionRange(pos, pos); } catch(e){} });
+  if (keepPos != null){ sq.focus(); try { sq.setSelectionRange(keepPos, keepPos); } catch(e){} }
+  el.querySelectorAll("[data-edloc]").forEach(function(b){ b.addEventListener("click", function(){ ed.loc = b.getAttribute("data-edloc"); renderEditor(); }); });
+  el.querySelectorAll("[data-add]").forEach(function(b){ b.addEventListener("click", function(){ var n = b.getAttribute("data-add"); if (c.items.some(function(x){ return x[0] === n; })){ toast("Já está no treino"); return; } var sc = parseScheme("3×10"); var ex = EX[n] || {}; var def = /mobilidade/.test(ex.muscle) ? "1×30s/lado" : (/cardio/.test(ex.muscle) ? "1×5 min" : (/core/.test(ex.muscle) ? "3×12" : "3×10")); var loaded = /Home Gym|Rack|Banco|Barra|Fixos|Máquinas/.test(ex.g || "") || /Halteres|Kettlebell|Halter\)/.test(n); c.items.push([n, def, 7, loaded ? "10 kg" : ""]); toast("Adicionado: " + enShort(n)); renderEditor(); }); });
+  el.querySelectorAll("[data-del]").forEach(function(b){ b.addEventListener("click", function(){ c.items.splice(+b.getAttribute("data-del"), 1); renderEditor(); }); });
+  el.querySelectorAll("[data-up]").forEach(function(b){ b.addEventListener("click", function(){ var i = +b.getAttribute("data-up"); if (i > 0){ var t = c.items[i]; c.items[i] = c.items[i - 1]; c.items[i - 1] = t; renderEditor(); } }); });
+  el.querySelectorAll("[data-down]").forEach(function(b){ b.addEventListener("click", function(){ var i = +b.getAttribute("data-down"); if (i < c.items.length - 1){ var t = c.items[i]; c.items[i] = c.items[i + 1]; c.items[i + 1] = t; renderEditor(); } }); });
+  el.querySelectorAll("[data-sch]").forEach(function(sel){ sel.addEventListener("change", function(){ var i = +sel.getAttribute("data-sch"); if (sel.value === "__free"){ ed.free[i] = true; renderEditor(); var f = document.querySelector('[data-schfree="' + i + '"]'); if (f) f.focus(); return; } c.items[i][1] = sel.value; }); });
+  el.querySelectorAll("[data-schfree]").forEach(function(inp){ inp.addEventListener("change", function(){ var v = inp.value.trim().replace(/x/i, "×").replace(/\s*×\s*/, "×"); if (v) c.items[+inp.getAttribute("data-schfree")][1] = v; }); });
+  el.querySelectorAll("[data-zone]").forEach(function(b){ b.addEventListener("click", function(){ var z = b.getAttribute("data-zone"); ed.zone = ed.zone === z ? null : z; ed.q = ""; renderEditor(); }); });
+  el.querySelectorAll("[data-eff]").forEach(function(sel){ sel.addEventListener("change", function(){ c.items[+sel.getAttribute("data-eff")][2] = parseInt(sel.value, 10); }); });
+  el.querySelectorAll("[data-kg]").forEach(function(inp){ inp.addEventListener("change", function(){ var v = parseFloat(String(inp.value).replace(",", ".")); c.items[+inp.getAttribute("data-kg")][3] = isNaN(v) ? "" : (v + " kg"); }); });
+  el.querySelectorAll("[data-opt]").forEach(function(b){ b.addEventListener("click", function(){ var o = b.getAttribute("data-opt"); c[o] = !(o === "ss" ? c.ss : c[o] !== false); renderEditor(); }); });
+  el.querySelectorAll("[data-rest]").forEach(function(b){ b.addEventListener("click", function(){ c.rest = +b.getAttribute("data-rest"); renderEditor(); }); });
+  document.getElementById("edSave").addEventListener("click", function(){
+    if (!c.items.length){ toast("Adiciona pelo menos um exercício"); return; }
+    if (!c.name.trim()) c.name = "O meu treino";
+    st.custom[ed.id] = c; st.type = "custom:" + ed.id; save(); ui.ed = null; closeSheet(); renderHome(); toast("Treino guardado");
+    var hero = document.querySelector(".hero"); if (hero) hero.scrollIntoView({behavior:"smooth", block:"start"});
+  });
+  var dl = document.getElementById("edDel"); if (dl) dl.addEventListener("click", function(){ ed.confirmDel = true; renderEditor(); });
+  var dy = document.getElementById("edDelYes"); if (dy) dy.addEventListener("click", function(){ delete st.custom[ed.id]; if (st.type === "custom:" + ed.id) st.type = "legs"; save(); ui.ed = null; closeSheet(); renderHome(); toast("Treino apagado"); });
 }
 function closeSheet(){ var el = document.getElementById("sheet"); el.hidden = true; el.innerHTML = ""; }
 
@@ -2123,7 +2277,7 @@ function renderWorkout(){
     el.innerHTML = h;
     document.getElementById("finishBtn").addEventListener("click", function(){
       logSession();
-      st.ver[st.sess.type] = (st.sess.ver + 1) % TYPES[st.sess.type].versions.length;
+      st.ver[st.sess.type] = (st.sess.ver + 1) % typeOf(st.sess.type).versions.length;
       st.sess = null; ui.rest = null; save(); showWorkout(false);
     });
     var fr = document.getElementById("finishRepeat");
