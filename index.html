@@ -748,7 +748,7 @@ var FEEL = {
 
 /* ---------- locais ---------- */
 var LOCS = {
-  gym:  {name:"Fitness Up",       sub:"ginásio",     note:"Pesos livres, máquinas e cardio"},
+  gym:  {name:"Fitness Up",       sub:"ginásio",     note:"Pesos livres primeiro; máquinas só o essencial (polias, leg curl, cardio)"},
   condo:{name:"Ginásio de casa",  sub:"condomínio",  note:"Rack, barra, Home Gym, halteres, bike"},
   home: {name:"Sem ginásio",      sub:"em casa",     note:"Peso corporal, tapete e elásticos"}
 };
@@ -759,7 +759,7 @@ var GROUP_LOC = {
   "Home Gym 900":["condo"], "Power Rack 900":["condo"], "Banco Ajustável":["gym","condo"], "Halteres + Barra":["gym","condo"],
   "Halteres Fixos":["condo"], "Bicicleta Estática":["condo"], "Elásticos de Resistência":["gym","condo","home"],
   "Peso Corporal":["gym","condo","home"], "Alongamentos":["gym","condo","home"],
-  "Máquinas · Fitness Up":["gym"], "Cardio · Fitness Up":["gym"], "Funcional":["gym","condo"], "Sem ginásio":["home"]
+  "Máquinas · Fitness Up":["gym"], "Halteres · Fitness Up":["gym"], "Cardio · Fitness Up":["gym"], "Funcional":["gym","condo"], "Sem ginásio":["home"]
 };
 
 /* ---------- exercícios novos ---------- */
@@ -800,6 +800,9 @@ LIB.push(
     ["Escada – Contínuo","cardio","Ritmo constante, esforço 6–7, sem te apoiares nos corrimões. Passo completo em cada degrau.","Escada rolante (stair climber)"],
     ["Escada – Intervalos","cardio","1 min forte / 1 min leve. Nos minutos fortes, dois degraus de cada vez se conseguires.","Escada rolante (stair climber)"],
     ["Elíptica – Contínuo","cardio","Ritmo constante, esforço 5–6, resistência média. Bom para recuperar sem impacto.","Elíptica"]
+  ]},
+  {g:"Halteres · Fitness Up", items:[
+    ["Elevação Lateral (Halteres)","ombros","Halteres ao lado do corpo, cotovelos ligeiramente fletidos. Eleva os braços de lado até à linha dos ombros sem encolher o trapézio e desce devagar.","De pé, halteres nas mãos"]
   ]},
   {g:"Funcional", items:[
     ["Kettlebell Swing","gluteo","Pés um pouco mais largos que a anca, kettlebell entre as pernas. Dobra a anca para trás (não é squat), deixa o KB passar entre as coxas e estica a anca com força até o KB chegar à altura do peito. Braços soltos, é a anca que manda.","De pé, kettlebell no chão à frente"],
@@ -868,7 +871,7 @@ Object.assign(EX_EN, {
   "Pull-Up Assistido (Máquina ou Elástico)":"Assisted Pull-Up", "Face Pull (Polia)":"Cable Face Pull", "Tríceps na Polia (Corda)":"Rope Tricep Pushdown",
   "Rosca Bíceps na Polia":"Cable Bicep Curl", "Kickback de Glúteo (Polia)":"Cable Glute Kickback", "Abdução de Anca (Polia)":"Cable Hip Abduction",
   "Pull-Through (Polia)":"Cable Pull-Through", "Pallof Press (Polia)":"Pallof Press", "Crunch na Polia (Corda)":"Cable Crunch", "Crossover (Polia)":"Cable Crossover",
-  "Elevação Lateral (Polia)":"Cable Lateral Raise", "Woodchop (Polia)":"Cable Woodchop",
+  "Elevação Lateral (Polia)":"Cable Lateral Raise", "Elevação Lateral (Halteres)":"Dumbbell Lateral Raise", "Woodchop (Polia)":"Cable Woodchop",
   "Passadeira – Aquecimento":"Treadmill Warm-Up", "Passadeira – Intervalos":"Treadmill Intervals", "Passadeira – Inclinada":"Incline Walk",
   "Remo – Aquecimento":"Rower Warm-Up", "Remo – Intervalos":"Rowing Intervals", "Escada – Contínuo":"Stair Climber", "Escada – Intervalos":"Stair Climber Intervals", "Elíptica – Contínuo":"Elliptical",
   "Kettlebell Swing":"Kettlebell Swing", "Thruster (Halteres)":"Dumbbell Thruster", "Box Jump":"Box Jump", "Wall Ball":"Wall Ball", "Farmer's Carry (Halteres)":"Farmer's Carry",
@@ -911,6 +914,7 @@ Object.assign(FEEL, {
   "Crunch na Polia (Corda)":["O abdómen a enrolar o tronco.","Puxar com os braços ou mexer a anca."],
   "Crossover (Polia)":["O peito a espremer quando as mãos se juntam.","Dobrar muito os cotovelos e fazer press."],
   "Elevação Lateral (Polia)":["O lado do ombro a trabalhar de cima a baixo.","Encolher o trapézio."],
+  "Elevação Lateral (Halteres)":["O lado do ombro a trabalhar.","Encolher o trapézio ou balançar."],
   "Woodchop (Polia)":["Os oblíquos e a anca a rodar juntos.","Puxar só com os braços."],
   "Passadeira – Aquecimento":["A respiração a subir aos poucos.","Começar a correr forte."],
   "Passadeira – Intervalos":["Sem fôlego no fim dos 30s rápidos, recuperada no fim dos 30s lentos.","Segurar nos corrimões."],
@@ -1066,7 +1070,7 @@ Object.assign(ALIAS, {
   "Remada Sentada (Polia)": "Remada Baixa Sentada", "Remada c/ Elástico": "Remada Baixa Sentada", "Remada c/ Apoio ao Peito (Máquina)": "Remada Baixa Sentada",
   "Kickback de Glúteo (Polia)": "Kickback de Glúteo na Polia Baixa", "Abdução de Anca na Polia Baixa": "Abdução de Anca (Polia)", "Adução de Anca na Polia Baixa": "Abdução de Anca (Polia)",
   "Tríceps na Polia (Corda)": "Tríceps na Polia Alta (Corda)", "Rosca Bíceps na Polia": "Rosca Direta (Barra/Halteres)", "Rosca Bíceps na Polia Baixa": "Rosca Direta (Barra/Halteres)", "Rosca Direta (Halteres) – Banco Sentado": "Rosca Direta (Barra/Halteres)", "Rosca Martelo (Halteres)": "Rosca Direta (Barra/Halteres)", "Rosca Bíceps c/ Elástico": "Rosca Direta (Barra/Halteres)",
-  "Elevação Lateral na Polia Baixa": "Elevação Lateral (Polia)", "Elevação Lateral c/ Elástico": "Elevação Lateral (Polia)",
+  "Elevação Lateral na Polia Baixa": "Elevação Lateral (Polia)", "Elevação Lateral c/ Elástico": "Elevação Lateral (Polia)", "Elevação Lateral (Halteres)": "Elevação Lateral (Polia)",
   "Extensão de Tríceps c/ Elástico": "Extensão de Tríceps (Halteres acima cabeça)",
   "Tricep Dips (Banco)": "Dips (Banco)", "Dips (Cadeira)": "Dips (Banco)",
   "Crunch na Polia Alta": "Crunch na Polia (Corda)", "Woodchop (Polia)": "Woodchop Alto-Baixo (Polia)",
@@ -1076,8 +1080,10 @@ Object.assign(ALIAS, {
   "Afundo Búlgaro (Cadeira)": "Afundo Búlgaro (Banco + Halter)", "Desenvolvimento Ombro (Halteres em pé)": "Desenvolvimento Ombro (Halteres) – Banco Sentado"
 });
 FIG["Extensão de Pernas (Máquina)"] = FIG["Extensão de Pernas (Rolos)"];
+FIG["Crucifixo (Halteres) – Banco Plano"] = "P l 24,82 112,82|P l 40,82 40,112|P l 96,82 96,112|B c 30,74,7|B l 38,78 86,78|B l 44,78 30,56 22,44|A c 20,42,4|B l 44,78 58,56 66,44|A c 68,42,4|B l 86,78 110,74 116,110|M d M 26 36 Q 44 22 62 36";
 
 Object.assign(FEEL, {
+  "Crucifixo (Halteres) – Banco Plano":["O peito a alongar na abertura e a espremer ao fechar.","Descer demasiado ou dobrar muito os cotovelos."],
   "Mountain Climbers": ["O core a segurar a anca enquanto as pernas correm.", "A anca a subir para o teto."],
   "Abdução de Anca na Polia Baixa": ["O lado da anca a trabalhar.", "Inclinar o tronco para o lado."],
   "Afundo Caminhando (Halteres)": ["Glúteo e coxa da perna da frente a empurrar.", "Joelho da frente a cair para dentro."],
@@ -1117,8 +1123,8 @@ var VARIANTS = {
   squat:        {gym:["Squat (Barra) - Rack","40 kg"],               condo:["Squat (Barra) - Rack","40 kg"],               home:["Agachamento Tempo 3-1-1",""]},
   front_squat:  {gym:["Squat Frontal (Barra) - Rack","30 kg"],       condo:["Squat Frontal (Barra) - Rack","30 kg"],       home:["Agachamento Sumo c/ Elástico",""]},
   goblet:       {gym:["Goblet Squat (Halter)","16 kg"],              condo:["Goblet Squat (Halter)","16 kg"],              home:["Agachamento (Peso Corporal)",""]},
-  leg_press:    {gym:["Leg Press (Máquina)","80 kg"],                condo:["Goblet Squat (Halter)","18 kg"],              home:["Agachamento Sumo c/ Elástico",""]},
-  hack:         {gym:["Hack Squat (Máquina)","40 kg"],               condo:["Squat (Barra) - Rack","40 kg"],               home:["Agachamento Tempo 3-1-1",""]},
+  leg_press:    {gym:["Goblet Squat (Halter)","18 kg"],                condo:["Goblet Squat (Halter)","18 kg"],              home:["Agachamento Sumo c/ Elástico",""]},
+  hack:         {gym:["Squat Frontal (Barra) - Rack","30 kg"],               condo:["Squat (Barra) - Rack","40 kg"],               home:["Agachamento Tempo 3-1-1",""]},
   deadlift:     {gym:["Deadlift (Barra)","55 kg"],                   condo:["Deadlift (Barra)","55 kg"],                   home:["Bom Dia c/ Elástico",""]},
   rdl:          {gym:["RDL (Barra)","40 kg"],                        condo:["RDL (Barra)","40 kg"],                        home:["RDL Unilateral (Peso Corporal)",""]},
   sumo_dl:      {gym:["Deadlift Sumo (Barra)","50 kg"],              condo:["Deadlift Sumo (Barra)","50 kg"],              home:["Agachamento Sumo c/ Elástico",""]},
@@ -1127,33 +1133,33 @@ var VARIANTS = {
   bulgarian:    {gym:["Afundo Búlgaro (Banco + Halter)","8 kg/mão"], condo:["Afundo Búlgaro (Banco + Halter)","8 kg/mão"], home:["Afundo Búlgaro (Cadeira)",""]},
   lunge:        {gym:["Afundo Caminhando (Halteres)","8 kg/mão"],    condo:["Afundo Caminhando (Halteres)","8 kg/mão"],    home:["Afundo Inverso",""]},
   stepup:       {gym:["Stepup (Banco + Halteres)","8 kg/mão"],       condo:["Stepup (Banco + Halteres)","8 kg/mão"],       home:["Split Squat (Peso Corporal)",""]},
-  glute_med:    {gym:["Abdutora (Máquina)","35 kg"],                 condo:["Abdução de Anca na Polia Baixa","10 kg"],     home:["Clamshell c/ Mini Band",""]},
+  glute_med:    {gym:["Monster Walk (c/ Elástico nos joelhos)",""],                 condo:["Abdução de Anca na Polia Baixa","10 kg"],     home:["Clamshell c/ Mini Band",""]},
   glute_med2:   {gym:["Abdução de Anca (Polia)","10 kg"],            condo:["Monster Walk (c/ Elástico nos joelhos)",""],  home:["Abdução de Anca Deitada",""]},
   kickback:     {gym:["Kickback de Glúteo (Polia)","10 kg"],         condo:["Kickback de Glúteo na Polia Baixa","10 kg"],  home:["Kickback de Glúteo c/ Mini Band",""]},
   hamstring:    {gym:["Leg Curl Deitada (Máquina)","25 kg"],         condo:["Flexão de Pernas em Pé (Rolos)","12 kg"],     home:["Hamstring Walkout",""]},
-  hamstring2:   {gym:["Leg Curl Sentada (Máquina)","30 kg"],         condo:["Flexão de Pernas em Pé (Rolos)","12 kg"],     home:["Ponte Glúteos Unilateral",""]},
-  quad_iso:     {gym:["Extensão de Pernas (Máquina)","30 kg"],       condo:["Extensão de Pernas (Rolos)","25 kg"],         home:["Agachamento Tempo 3-1-1",""]},
-  adductor:     {gym:["Adutora (Máquina)","35 kg"],                  condo:["Adução de Anca na Polia Baixa","10 kg"],      home:["Agachamento Sumo c/ Elástico",""]},
+  hamstring2:   {gym:["Kettlebell Swing","16 kg"],         condo:["Flexão de Pernas em Pé (Rolos)","12 kg"],     home:["Ponte Glúteos Unilateral",""]},
+  quad_iso:     {gym:["Goblet Squat (Halter)","16 kg"],       condo:["Extensão de Pernas (Rolos)","25 kg"],         home:["Agachamento Tempo 3-1-1",""]},
+  adductor:     {gym:["Deadlift Sumo (Barra)","45 kg"],                  condo:["Adução de Anca na Polia Baixa","10 kg"],      home:["Agachamento Sumo c/ Elástico",""]},
   pull_through: {gym:["Pull-Through (Polia)","20 kg"],               condo:["Kettlebell Swing","12 kg"],                   home:["Bom Dia c/ Elástico",""]},
   kb_swing:     {gym:["Kettlebell Swing","16 kg"],                   condo:["Kettlebell Swing","16 kg"],                   home:["Salto em Comprimento",""]},
   /* superior */
   bench:        {gym:["Supino c/ Halteres","12 kg/mão"],             condo:["Supino Plano (Halteres) – Banco","12 kg/mão"], home:["Flexões (Padrão)",""]},
   incline:      {gym:["Supino Inclinado (Halteres)","10 kg/mão"],    condo:["Supino Inclinado (Halteres) – Banco","10 kg/mão"], home:["Flexões em Declive",""]},
-  chest_press:  {gym:["Chest Press (Máquina)","30 kg"],              condo:["Supino na Máquina (Chest Press)","30 kg"],    home:["Flexões (Padrão)",""]},
-  fly:          {gym:["Crossover (Polia)","10 kg"],                  condo:["Butterfly (Pec Deck)","20 kg"],               home:["Flexões em Incline",""]},
+  chest_press:  {gym:["Supino Inclinado (Halteres)","10 kg/mão"],              condo:["Supino na Máquina (Chest Press)","30 kg"],    home:["Flexões (Padrão)",""]},
+  fly:          {gym:["Crucifixo (Halteres) – Banco Plano","6 kg/mão"],                  condo:["Butterfly (Pec Deck)","20 kg"],               home:["Flexões em Incline",""]},
   ohp:          {gym:["Desenvolvimento Ombro (Halteres) – Banco Sentado","8 kg/mão"], condo:["Desenvolvimento Ombro (Halteres) – Banco Sentado","8 kg/mão"], home:["Pike Push-Up",""]},
-  ohp2:         {gym:["Shoulder Press (Máquina)","20 kg"],           condo:["Desenvolvimento Ombro (Halteres em pé)","8 kg/mão"], home:["Press de Ombros c/ Elástico",""]},
-  lat_raise:    {gym:["Elevação Lateral (Polia)","5 kg"],            condo:["Elevação Lateral na Polia Baixa","5 kg"],     home:["Elevação Lateral c/ Elástico",""]},
+  ohp2:         {gym:["Desenvolvimento Ombro (Halteres em pé)","8 kg/mão"],           condo:["Desenvolvimento Ombro (Halteres em pé)","8 kg/mão"], home:["Press de Ombros c/ Elástico",""]},
+  lat_raise:    {gym:["Elevação Lateral (Halteres)","5 kg/mão"],            condo:["Elevação Lateral na Polia Baixa","5 kg"],     home:["Elevação Lateral c/ Elástico",""]},
   row_db:       {gym:["Remada com Halteres (Unilateral)","14 kg"],   condo:["Remada com Halteres (Unilateral)","14 kg"],   home:["Remada c/ Elástico",""]},
   row_cable:    {gym:["Remada Sentada (Polia)","30 kg"],             condo:["Remada Baixa Sentada","30 kg"],               home:["Remada Invertida (Mesa)",""]},
-  row_chest:    {gym:["Remada c/ Apoio ao Peito (Máquina)","25 kg"], condo:["Remada Curvada (Barra)","25 kg"],             home:["Remada c/ Elástico",""]},
+  row_chest:    {gym:["Remada Curvada (Barra)","25 kg"], condo:["Remada Curvada (Barra)","25 kg"],             home:["Remada c/ Elástico",""]},
   pulldown:     {gym:["Lat Pulldown (Polia)","32 kg"],               condo:["Puxada Alta (Barra Larga)","32 kg"],          home:["Puxada c/ Elástico (Porta)",""]},
   pulldown_close:{gym:["Pull-Up Assistido (Máquina ou Elástico)",""], condo:["Puxada Pega Fechada (Supinada)","30 kg"],    home:["Puxada c/ Elástico (Porta)",""]},
   pullup:       {gym:["Pull-Up (Barra)",""],                         condo:["Pull-Up (Barra)",""],                         home:["Remada Invertida (Mesa)",""]},
   face_pull:    {gym:["Face Pull (Polia)","15 kg"],                  condo:["Face Pull (Corda na Polia Alta)","15 kg"],    home:["Pull Apart (c/ Elástico)",""]},
   rear_delt:    {gym:["Fly Reverso (Halteres) – Banco Inclinado","5 kg/mão"], condo:["Fly Reverso (Halteres) – Banco Inclinado","5 kg/mão"], home:["Pull Apart (c/ Elástico)",""]},
   biceps:       {gym:["Rosca Direta (Barra/Halteres)","8 kg/mão"],   condo:["Rosca Direta (Halteres) – Banco Sentado","8 kg/mão"], home:["Rosca Bíceps c/ Elástico",""]},
-  biceps2:      {gym:["Rosca Bíceps na Polia","15 kg"],              condo:["Rosca Bíceps na Polia Baixa","15 kg"],        home:["Rosca Bíceps c/ Elástico",""]},
+  biceps2:      {gym:["Rosca Martelo (Halteres)","8 kg/mão"],              condo:["Rosca Bíceps na Polia Baixa","15 kg"],        home:["Rosca Bíceps c/ Elástico",""]},
   hammer:       {gym:["Rosca Martelo (Halteres)","8 kg/mão"],        condo:["Rosca Martelo (Halteres)","8 kg/mão"],        home:["Rosca Bíceps c/ Elástico",""]},
   triceps:      {gym:["Tríceps na Polia (Corda)","15 kg"],           condo:["Tríceps na Polia Alta (Corda)","15 kg"],      home:["Flexões Diamante",""]},
   triceps2:     {gym:["Extensão de Tríceps (Halteres acima cabeça)","6 kg/mão"], condo:["Extensão de Tríceps (Halteres acima cabeça)","6 kg/mão"], home:["Extensão de Tríceps c/ Elástico",""]},
