@@ -92,7 +92,7 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(-
 .holes .s span{display:block;font-size:11px;color:#A9B8AE;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .go{height:56px;border-radius:14px;border:none;background:var(--chalk);color:var(--ink);display:flex;align-items:center;justify-content:space-between;padding:0 18px;font-size:16px;font-weight:700;width:100%}
 .exrows{display:flex;flex-direction:column;margin-top:4px}
-.exrow{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:8px;align-items:baseline;padding:7px 0;border-top:1px solid rgba(255,255,255,.1);font-size:13px}
+.exrow{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:8px;align-items:baseline;padding:7px 0;border-top:1px solid rgba(255,255,255,.1);font-size:13px;width:100%;background:none;border-left:none;border-right:none;border-bottom:none;text-align:left;color:var(--chalk);font-family:inherit}
 .exrow .c{font-family:var(--display);font-size:15px;font-weight:800;color:var(--mint)}
 .exrow .n{color:var(--chalk);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .exrow .n small{display:block;font-size:11px;color:#A9B8AE;font-style:italic}
@@ -1572,13 +1572,13 @@ function fig(name, extraClass){
 
 /* ---------- state ---------- */
 var KEY = "dfc1";
-var st = {loc:"gym", type:"legs", dur:"long", ver:{}, weights:{}, last:{}, sess:null, log:[], sound:false, keepAwake:true, ssMode:"alt", custom:{}};
+var st = {loc:"gym", type:"legs", dur:"long", ver:{}, weights:{}, last:{}, sess:null, log:[], sound:false, keepAwake:true, ssMode:"alt", custom:{}, subs:{}};
 var ui = {tab:"home", filter:null, libLoc:null, search:"", rest:null, viewDone:null, confirmEnd:false, nsec:"base", nmeal:null, nq:""};
 try {
   var saved = JSON.parse(localStorage.getItem(KEY) || "null");
   if (saved){
     if (LOCS[saved.loc]) st.loc = saved.loc;
-    st.custom = saved.custom || {};
+    st.custom = saved.custom || {}; st.subs = saved.subs || {};
     if (typeOf(saved.type)) st.type = saved.type;
     if (saved.dur === "short" || saved.dur === "long") st.dur = saved.dur;
     st.ver = saved.ver || {}; st.weights = saved.weights || {}; st.last = saved.last || {}; st.sess = saved.sess || null; st.log = saved.log || [];
@@ -1604,7 +1604,7 @@ function importData(file){
     try {
       var j = JSON.parse(r.result), d = j && j.data ? j.data : j;
       if (!d || !d.weights){ toast("Ficheiro não reconhecido"); return; }
-      st.weights = d.weights || {}; st.last = d.last || {}; st.log = d.log || []; st.ver = d.ver || {}; st.custom = d.custom || {};
+      st.weights = d.weights || {}; st.last = d.last || {}; st.log = d.log || []; st.ver = d.ver || {}; st.custom = d.custom || {}; st.subs = d.subs || {};
       if (LOCS[d.loc]) st.loc = d.loc; if (typeOf(d.type)) st.type = d.type;
       st.sess = null; save(); renderHome(); toast("Cópia importada: " + st.log.length + " treinos");
     } catch(e){ toast("Não consegui ler o ficheiro"); }
@@ -1694,7 +1694,28 @@ function typeOf(key){
   if (c.stretch !== false) blocks.push({name:AL, rest:"respira fundo", items:CUSTOM_STRETCH});
   return {name:c.name || "O meu treino", focus:"Treino criado pela Diana", kind:"custom", custom:true, noDuration:true, versions:[{blocks:blocks}]};
 }
-function resolveDay(typeKey, ver, loc, dur){
+var FAMILIES = [
+  ["squat","front_squat","goblet","leg_press","hack","quad_iso"],
+  ["deadlift","rdl","sumo_dl","pull_through","kb_swing"],
+  ["hip_thrust","hip_thrust_db","kickback","glute_med","glute_med2","adductor"],
+  ["bulgarian","lunge","stepup"],
+  ["hamstring","hamstring2"],
+  ["bench","incline","chest_press","fly","pushup_hard"],
+  ["ohp","ohp2","lat_raise"],
+  ["row_db","row_cable","row_chest","renegade"],
+  ["pulldown","pulldown_close","pullup"],
+  ["face_pull","rear_delt"],
+  ["biceps","biceps2","hammer"],
+  ["triceps","triceps2","dips"],
+  ["pallof","cable_crunch","woodchop","hanging_knee","farmer"],
+  ["cardio_warm","cardio_warm2","cardio_cool","cardio_ell"],
+  ["cardio_int","cardio_int2","cardio_int3","cardio_steady","cardio_steady2"],
+  ["box_jump","wall_ball","thruster","row_cal"],
+  ["st_chest","st_lats","st_hams"]
+];
+function subKey(typeKey, ver, loc){ return typeKey + "|" + ver + "|" + loc; }
+function itemKey(b, ii){ return b.name + "#" + ii; }
+function resolveDay(typeKey, ver, loc, dur, subs){
   var t = typeOf(typeKey), v = t.versions[ver % t.versions.length], short = dur === "short" && !t.noDuration;
   var blocks = [];
   v.blocks.forEach(function(b){
@@ -1705,7 +1726,8 @@ function resolveDay(typeKey, ver, loc, dur){
       if (b.short.items) nb.items = b.short.items;
       if (b.short.wod) nb.wod = Object.assign({}, b.short.wod);
     }
-    nb.items = nb.items.map(function(it){ var r = resolveItem(it, loc); if (it.length > 3 && it[3]) r[3] = it[3]; return r; });
+    nb.pats = nb.items.map(function(it){ return it[0]; });
+    nb.items = nb.items.map(function(it, ii){ var r = resolveItem(it, loc); if (it.length > 3 && it[3]) r[3] = it[3]; var sb = subs && subs[itemKey(nb, ii)]; if (sb) r = [sb[0], r[1], r[2], sb[3] || ""]; return r; });
     nb.min = blockMinutes(nb);
     blocks.push(nb);
   });
@@ -1714,8 +1736,9 @@ function resolveDay(typeKey, ver, loc, dur){
   return {key:typeKey, ver:ver % t.versions.length, verLabel:vl, title:t.name, focus:t.focus, kind:t.kind, min:min, blocks:blocks, loc:loc, dur:dur, noDuration:!!t.noDuration};
 }
 function curVer(typeKey){ return st.ver[typeKey] || 0; }
-function curDay(){ return resolveDay(st.type, curVer(st.type), st.loc, st.dur); }
-function sessDay(){ var s = st.sess; return s ? resolveDay(s.type, s.ver, s.loc, s.dur) : null; }
+function curSubs(){ return st.subs[subKey(st.type, curVer(st.type), st.loc)] || null; }
+function curDay(){ return resolveDay(st.type, curVer(st.type), st.loc, st.dur, curSubs()); }
+function sessDay(){ var s = st.sess; return s ? resolveDay(s.type, s.ver, s.loc, s.dur, s.subs || null) : null; }
 function itemAt(day, bi, ii){ return day.blocks[bi].items[ii]; }
 function codeOf(day, bi, ii){ return blockCode(day.blocks[bi].name) + (ii + 1); }
 function effortMax(day){ var m = 0; day.blocks.forEach(function(b){ b.items.forEach(function(it){ m = Math.max(m, it[2] || 0); }); }); return m; }
@@ -1839,7 +1862,8 @@ function previewRows(day){
     h += '<div class="exhead">' + esc(b.name) + (isWod(b) ? ' · ' + esc(wodTitle(b)) : '') + ' · ' + b.min + '′</div>';
     b.items.forEach(function(it, ii){
       var kg = curKg(it);
-      h += '<div class="exrow"><span class="c">' + codeOf(day, bi, ii) + '</span><span class="n">' + esc(enName(it[0])) + (ptName(it[0]) ? '<small>' + esc(ptName(it[0])) + '</small>' : '') + '</span><span class="v">' + esc(it[1]) + (kg != null ? ' · ' + fmtKg(kg) + ' ' + unitOf(it) : '') + '</span></div>';
+      var sw = (curSubs() || {})[itemKey(b, ii)];
+      h += '<button class="exrow" data-swap="' + bi + '.' + ii + '"><span class="c">' + codeOf(day, bi, ii) + '</span><span class="n">' + esc(enName(it[0])) + (sw ? ' <em style="font-style:normal;color:var(--mint);font-size:10px">trocado</em>' : '') + (ptName(it[0]) ? '<small>' + esc(ptName(it[0])) + '</small>' : '') + '</span><span class="v">' + esc(it[1]) + (kg != null ? ' · ' + fmtKg(kg) + ' ' + unitOf(it) : '') + ' ⇄</span></button>';
     });
   });
   return h + '</div>';
@@ -1896,7 +1920,7 @@ function renderHome(){
   } else {
     h += '<button class="go" id="goBtn"><span>Começar treino</span>' + ARROW + '</button>';
   }
-  h += '<details open><summary class="eyebrow" style="color:#A9B8AE;cursor:pointer;list-style:none">Ver os exercícios ▾</summary>' + previewRows(day) + '</details>';
+  h += '<details open><summary class="eyebrow" style="color:#A9B8AE;cursor:pointer;list-style:none">Exercícios · toca num para trocar ▾</summary>' + previewRows(day) + '</details>';
   h += '</div>';
 
   var lg = (st.log || []).slice(-1)[0];
@@ -1921,6 +1945,7 @@ function renderHome(){
   el.querySelectorAll("[data-type]").forEach(function(b){ b.addEventListener("click", function(){ st.type = b.getAttribute("data-type"); save(); renderHome(); var hero = el.querySelector(".hero"); if (hero) hero.scrollIntoView({behavior:"smooth", block:"start"}); }); });
   el.querySelectorAll("[data-dur]").forEach(function(b){ b.addEventListener("click", function(){ st.dur = b.getAttribute("data-dur"); save(); renderHome(); }); });
   document.getElementById("goBtn").addEventListener("click", function(){ unlockAudio(); startOrResume(); });
+  el.querySelectorAll("[data-swap]").forEach(function(b){ b.addEventListener("click", function(){ var p = b.getAttribute("data-swap").split("."); openSwap(+p[0], +p[1], false); }); });
   var db = document.getElementById("dropBtn"); if (db) db.addEventListener("click", function(){ st.sess = null; ui.rest = null; save(); renderHome(); toast("Treino descartado"); });
   el.querySelectorAll("[data-log]").forEach(function(b){ b.addEventListener("click", function(){ openLog(parseInt(b.getAttribute("data-log"), 10)); }); });
   document.getElementById("expBtn").addEventListener("click", exportData);
@@ -2021,6 +2046,54 @@ function openRecipe(i){
   if (r.tip) h += '<div class="rtip"><b>Dica:</b> ' + esc(r.tip) + '</div>';
   h += '</div>';
   showSheet(h);
+}
+
+/* ---------- TROCAR EXERCÍCIO ---------- */
+function swapCandidates(day, bi, ii){
+  var b = day.blocks[bi], cur = b.items[ii][0], pat = b.pats ? b.pats[ii] : null, loc = day.loc, out = [], seen = {};
+  seen[cur] = true;
+  var fam = null; FAMILIES.forEach(function(f){ if (pat && f.indexOf(pat) >= 0) fam = f; });
+  if (fam) fam.forEach(function(p){ if (p === pat) return; var v = VARIANTS[p] && VARIANTS[p][loc]; if (v && !seen[v[0]] && EX[v[0]]){ seen[v[0]] = true; out.push({n:v[0], ref:v[1] || "", why:"mesmo padrão"}); } });
+  var ex = EX[cur] || look(EX, cur) || {}, mus = (ex.muscle || "").split("/")[0];
+  if (mus){
+    LIB.forEach(function(g){
+      var gl = GROUP_LOC[g.g] || LOC_ORDER; if (gl.indexOf(loc) < 0) return;
+      g.items.forEach(function(it){
+        if (seen[it[0]] || it[1].split("/")[0] !== mus) return;
+        seen[it[0]] = true;
+        var loaded = /Home Gym|Rack|Banco|Barra|Fixos|Máquinas/.test(g.g) || /Halteres|Kettlebell|Halter\)/.test(it[0]);
+        out.push({n:it[0], ref:loaded ? (refKg(b.items[ii][3]) != null ? b.items[ii][3] : "10 kg") : "", why:mus});
+      });
+    });
+  }
+  var seenEn = {}; out = out.filter(function(c){ var e = enName(c.n); if (seenEn[e] || e === enName(cur)) return false; seenEn[e] = true; return true; });
+  return out.slice(0, 14);
+}
+function openSwap(bi, ii, inSess){
+  var day = inSess ? sessDay() : curDay(), b = day.blocks[bi], it = b.items[ii];
+  var cands = swapCandidates(day, bi, ii), k = itemKey(b, ii);
+  var subs = inSess ? (st.sess.subs || {}) : (curSubs() || {}), isSub = !!subs[k];
+  var h = '<div class="pan light" role="dialog" aria-modal="true" aria-label="Trocar exercício">';
+  h += '<div class="grab"><span class="eyebrow" style="color:var(--muted)">' + esc(codeOf(day, bi, ii) + " · " + b.name) + '</span>' + CLOSE_BTN + '</div>';
+  h += '<div class="disp" style="font-size:30px;margin-top:6px">Trocar ' + esc(enShort(it[0])) + '</div>';
+  h += '<p class="note" style="margin:8px 0 0">Alternativas com a mesma função neste treino, para ' + esc(LOCS[day.loc].name) + '. Séries, reps e esforço mantêm-se (' + esc(it[1]) + ' · ' + (it[2] || "—") + '/10).</p>';
+  if (isSub) h += '<button class="tech" id="swapReset" style="margin-top:12px;border-color:var(--green);color:var(--green)">Repor o exercício original</button>';
+  h += '<div class="wlist" style="margin-top:10px">';
+  if (!cands.length) h += '<p class="empty">Não há alternativas para este.</p>';
+  cands.forEach(function(c, i){
+    var f = fig(c.n, "light");
+    h += '<button class="lrow" data-swapto="' + i + '">' + (f ? '<span class="thumb">' + f + '</span>' : '<span class="thumb none">' + esc(GSHORT[(EX[c.n] || {}).g] || "") + '</span>') + '<span><div class="nm">' + esc(enName(c.n)) + '</div><div class="en">' + esc(ptName(c.n)) + ' <span class="mu">· ' + esc(c.why) + (c.ref ? ' · ' + esc(c.ref) : '') + '</span></div></span></button>';
+  });
+  h += '</div></div>';
+  showSheet(h);
+  var el = document.getElementById("sheet");
+  function apply(item){
+    if (inSess){ st.sess.subs = st.sess.subs || {}; if (item) st.sess.subs[k] = item; else delete st.sess.subs[k]; ui.rest = null; save(); closeSheet(); renderWorkout(); }
+    else { var sk = subKey(st.type, curVer(st.type), st.loc); st.subs[sk] = st.subs[sk] || {}; if (item) st.subs[sk][k] = item; else delete st.subs[sk][k]; if (!Object.keys(st.subs[sk]).length) delete st.subs[sk]; save(); closeSheet(); renderHome(); var hero = document.querySelector(".hero"); if (hero) hero.scrollIntoView({block:"start"}); }
+    toast(item ? "Trocado por " + enShort(item[0]) : "Exercício original reposto");
+  }
+  el.querySelectorAll("[data-swapto]").forEach(function(btn){ btn.addEventListener("click", function(){ var c = cands[+btn.getAttribute("data-swapto")]; apply([c.n, it[1], it[2], c.ref]); }); });
+  var rs = document.getElementById("swapReset"); if (rs) rs.addEventListener("click", function(){ apply(null); });
 }
 
 /* ---------- SHEET ---------- */
@@ -2175,7 +2248,7 @@ function closeSheet(){ var el = document.getElementById("sheet"); el.hidden = tr
 /* ---------- WORKOUT ---------- */
 function startOrResume(){
   if (!(st.sess && !st.sess.finished)){
-    st.sess = {type:st.type, ver:curVer(st.type), loc:st.loc, dur:st.dur, done:{}, wod:{}, accum:0, startedAt:Date.now(), running:true, finished:false, endSec:0};
+    st.sess = {type:st.type, ver:curVer(st.type), loc:st.loc, dur:st.dur, subs:JSON.parse(JSON.stringify(curSubs() || {})), done:{}, wod:{}, accum:0, startedAt:Date.now(), running:true, finished:false, endSec:0};
     ui.rest = null;
   } else if (!st.sess.running){
     st.sess.running = true; st.sess.startedAt = Date.now();
@@ -2359,7 +2432,7 @@ function wodCard(day, bi, extraActs){
   h += '<div class="wod-list">';
   b.items.forEach(function(it, ii){
     var on = !w.finished && started && (k === "emom" || k === "circuit") && info.station === ii, kg = curKg(it);
-    h += '<button class="wod-row' + (on ? ' on' : '') + '" data-tech="' + bi + '.' + ii + '" data-wodrow="' + ii + '"><span class="th">' + fig(it[0]) + '</span><span class="nm">' + esc(enName(it[0])) + '<small>' + esc(ptName(it[0]) || (EX[it[0]] || {}).setup || "") + '</small></span><span class="rp">' + esc(it[1]) + (kg != null ? '<br>' + fmtKg(kg) + ' ' + unitOf(it) : '') + '</span></button>';
+    h += '<button class="tool" data-swapin="' + bi + '.' + ii + '" style="align-self:flex-end;min-height:28px;margin:-2px 0 -6px;font-size:10px">⇄ trocar</button><button class="wod-row' + (on ? ' on' : '') + '" data-tech="' + bi + '.' + ii + '" data-wodrow="' + ii + '"><span class="th">' + fig(it[0]) + '</span><span class="nm">' + esc(enName(it[0])) + '<small>' + esc(ptName(it[0]) || (EX[it[0]] || {}).setup || "") + '</small></span><span class="rp">' + esc(it[1]) + (kg != null ? '<br>' + fmtKg(kg) + ' ' + unitOf(it) : '') + '</span></button>';
   });
   h += '</div>';
   if (k === "amrap" || k === "fortime"){
@@ -2478,7 +2551,7 @@ function renderWorkout(){
     h += '<div class="ex-meta"><span>' + esc(it[1]) + '</span><span class="sep">|</span><span>esforço ' + (it[2] || "—") + '/10</span>' + (refKg(it[3]) != null ? '<span class="sep">|</span><span>ref. ' + esc(it[3]) + '</span>' : '') + (last && last.kg != null ? '<span class="sep">|</span><span>última: ' + fmtKg(last.kg) + ' kg</span>' : '') + '</div>';
     var shint = sideHint(it); if (shint) h += '<div class="side-hint">' + esc(shint) + '</div>';
     h += restHtml + setsHtml;
-    h += '<div class="acts"><button class="tech" id="techBtn">Ver técnica <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M5 2.5L9.5 7 5 11.5" stroke="#9FD2B0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>' + undoHtml + skipHtml + '</div>';
+    h += '<div class="acts"><button class="tech" id="techBtn">Ver técnica <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M5 2.5L9.5 7 5 11.5" stroke="#9FD2B0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button class="tech" data-swapin="' + x.bi + '.' + x.ii + '">⇄ Trocar</button>' + undoHtml + skipHtml + '</div>';
     h += '</div>';
   }
 
@@ -2497,6 +2570,7 @@ function renderWorkout(){
   wireWorkoutCommon(); wireList(el);
   var tb = document.getElementById("techBtn"); if (tb) tb.addEventListener("click", function(){ openSheet(it[0], {it:it, code:code, block:blk.name}); });
   el.querySelectorAll("[data-tech]").forEach(function(b){ b.addEventListener("click", function(e){ e.stopPropagation(); var p = b.getAttribute("data-tech").split("."); var tIt = itemAt(day, +p[0], +p[1]); openSheet(tIt[0], {it:tIt, code:codeOf(day, +p[0], +p[1]), block:day.blocks[+p[0]].name}); }); });
+  el.querySelectorAll("[data-swapin]").forEach(function(b){ b.addEventListener("click", function(e){ e.stopPropagation(); var p = b.getAttribute("data-swapin").split("."); openSwap(+p[0], +p[1], true); }); });
   el.querySelectorAll("[data-sspick]").forEach(function(b){ b.addEventListener("click", function(){ setFocus(x.bi, parseInt(b.getAttribute("data-sspick"), 10)); }); });
   var sb = document.getElementById("skipBtn"); if (sb) sb.addEventListener("click", function(){ if (wod) wodFinish(x.bi); else markItemDone(x.bi, x.ii); });
   var ub = document.getElementById("undoBtn"); if (ub) ub.addEventListener("click", undoLast);
@@ -2566,7 +2640,7 @@ function ssBlockCard(day, x, blk, restHtml, setsHtml, extraActs){
       for (var k = 0; k < n; k++){ var dd = st.sess.done[bi + "." + ii + "." + k]; h += '<span class="pill' + (dd ? ' ok' : '') + '">S' + (k + 1) + (dd ? ' ✓' : '') + '</span>'; }
       h += '</div>';
     }
-    h += '<div class="acts"><button class="tech" data-tech="' + bi + '.' + ii + '">Técnica e explicação</button>' + (on ? extraActs : (d < n ? '<button class="tech" data-sspick="' + ii + '">Fazer este agora</button>' : '')) + '</div>';
+    h += '<div class="acts"><button class="tech" data-tech="' + bi + '.' + ii + '">Técnica e explicação</button><button class="tech" data-swapin="' + bi + '.' + ii + '">⇄ Trocar</button>' + (on ? extraActs : (d < n ? '<button class="tech" data-sspick="' + ii + '">Fazer este agora</button>' : '')) + '</div>';
     h += '</div>';
   });
   return h + '</div>';
