@@ -67,7 +67,7 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(-
 .tgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .tcard{min-height:92px;border:1px solid var(--line);border-radius:16px;background:var(--surface);text-align:left;padding:12px 12px 10px;display:flex;flex-direction:column;justify-content:space-between;gap:8px}
 .tcard .nm{font-family:var(--display);font-size:21px;font-weight:800;text-transform:uppercase;line-height:.95;letter-spacing:.01em}
-.tcard .fo{font-size:11.5px;color:var(--muted);line-height:1.3;margin-top:3px}
+.tcard .fo{font-size:11.5px;color:var(--muted);line-height:1.3;margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .tcard .mt{font-family:var(--mono);font-size:10.5px;color:var(--muted);display:flex;justify-content:space-between;gap:6px}
 .tcard .mt b{color:var(--green);font-weight:600}
 .tcard[aria-pressed="true"]{background:var(--ink);color:var(--chalk);border-color:var(--ink)}
@@ -1690,6 +1690,14 @@ function suggestedType(){
   });
   return best;
 }
+function keyExercises(day){
+  var names = [];
+  day.blocks.forEach(function(b){
+    if (/^Aquec|^Along|Arref/.test(b.name)) return;
+    b.items.forEach(function(it){ var n = enShort(it[0]); if (names.indexOf(n) < 0) names.push(n); });
+  });
+  return names.slice(0, 3).join(" · ") + (names.length > 3 ? " …" : "");
+}
 function previewRows(day){
   var h = '<div class="exrows">';
   day.blocks.forEach(function(b, bi){
@@ -1719,7 +1727,7 @@ function renderHome(){
   h += '<div class="tgrid" role="group" aria-label="Tipo de treino">';
   TYPE_ORDER.forEach(function(k){
     var tt = TYPES[k], l = lastOfType(k), d = resolveDay(k, curVer(k), st.loc, st.dur);
-    h += '<button class="tcard' + (k === sug && k !== st.type ? ' sug' : '') + '" data-type="' + k + '" aria-pressed="' + (st.type === k) + '"><span><span class="nm">' + esc(tt.name) + '</span><div class="fo">' + esc(tt.focus) + '</div></span><span class="mt"><span>' + (l ? esc(daysAgo(l.date)) : (k === sug ? '<b>sugestão</b>' : 'nunca')) + '</span><span>' + d.min + '′</span></span></button>';
+    h += '<button class="tcard' + (k === sug && k !== st.type ? ' sug' : '') + '" data-type="' + k + '" aria-pressed="' + (st.type === k) + '"><span><span class="nm">' + esc(tt.name) + '</span><div class="fo">' + esc(keyExercises(d)) + '</div></span><span class="mt"><span>' + (l ? esc(daysAgo(l.date)) : (k === sug ? '<b>sugestão</b>' : 'nunca')) + '</span><span>' + d.min + '′</span></span></button>';
   });
   h += '</div>';
 
@@ -1744,7 +1752,7 @@ function renderHome(){
   } else {
     h += '<button class="go" id="goBtn"><span>Começar treino</span>' + ARROW + '</button>';
   }
-  h += '<details><summary class="eyebrow" style="color:#A9B8AE;cursor:pointer;list-style:none">Ver os exercícios ▾</summary>' + previewRows(day) + '</details>';
+  h += '<details open><summary class="eyebrow" style="color:#A9B8AE;cursor:pointer;list-style:none">Ver os exercícios ▾</summary>' + previewRows(day) + '</details>';
   h += '</div>';
 
   var lg = (st.log || []).slice(-1)[0];
@@ -1765,7 +1773,7 @@ function renderHome(){
   h += '</div>';
   var el = document.getElementById("home");
   el.innerHTML = h;
-  el.querySelectorAll("[data-loc]").forEach(function(b){ b.addEventListener("click", function(){ st.loc = b.getAttribute("data-loc"); save(); renderHome(); }); });
+  el.querySelectorAll("[data-loc]").forEach(function(b){ b.addEventListener("click", function(){ st.loc = b.getAttribute("data-loc"); save(); renderHome(); toast("Treinos adaptados a " + LOCS[st.loc].name); }); });
   el.querySelectorAll("[data-type]").forEach(function(b){ b.addEventListener("click", function(){ st.type = b.getAttribute("data-type"); save(); renderHome(); var hero = el.querySelector(".hero"); if (hero) hero.scrollIntoView({behavior:"smooth", block:"start"}); }); });
   el.querySelectorAll("[data-dur]").forEach(function(b){ b.addEventListener("click", function(){ st.dur = b.getAttribute("data-dur"); save(); renderHome(); }); });
   document.getElementById("goBtn").addEventListener("click", function(){ unlockAudio(); startOrResume(); });
