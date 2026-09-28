@@ -1,5 +1,5 @@
 /* Diana Fit Coach – service worker. Muda a versão a cada atualização para os telemóveis apanharem a nova. */
-var VERSION = "dfc-v6";
+var VERSION = "dfc-v7";
 var FILES = ["./", "./index.html", "./manifest.webmanifest", "./icons/icon-192.png", "./icons/icon-512.png", "./icons/apple-touch-icon.png"];
 self.addEventListener("install", function(e){
   e.waitUntil(caches.open(VERSION).then(function(c){ return c.addAll(FILES); }).then(function(){ return self.skipWaiting(); }));
