@@ -118,7 +118,7 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(-
 
 /* tab bar */
 .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:10;background:rgba(237,240,234,.96);border-top:1px solid var(--line);padding:6px 16px calc(6px + env(safe-area-inset-bottom,0px));backdrop-filter:blur(8px)}
-.tabbar .in{max-width:480px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.tabbar .in{max-width:480px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
 .tabbar button{min-height:52px;border:none;background:none;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:12px;font-weight:600;color:var(--muted)}
 .tabbar button[aria-current="page"]{color:var(--ink);background:var(--paper2)}
 
@@ -268,6 +268,22 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(-
 .rounds .step{width:52px;height:52px;font-size:26px;border-radius:14px}
 .wod-note{margin:0;font-size:13px;line-height:1.45;color:var(--nsoft)}
 
+/* nutrição */
+.ncards{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.ncard{border:1px solid var(--line);border-radius:16px;background:var(--surface);padding:14px 14px 12px}
+.ncard b{display:block;font-size:15px;margin-bottom:4px}
+.ncard p{margin:0;font-size:13.5px;line-height:1.5;color:var(--ink)}
+.rrow{width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;text-align:left;background:none;border:none;border-top:1px solid var(--line);padding:11px 2px;min-height:56px}
+.rrow .nm{font-size:15px;font-weight:600;line-height:1.25}
+.rrow .mu{font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-top:3px}
+.rrow .kc{font-family:var(--mono);font-size:11px;color:var(--muted);text-align:right;line-height:1.4;white-space:nowrap}
+.rrow .kc b{color:var(--green);font-weight:600}
+.rlist{margin:8px 0 0;padding-left:18px;font-size:14px;line-height:1.55}
+.rlist li{margin:2px 0}
+.rsteps{margin:8px 0 0;padding-left:20px;font-size:14px;line-height:1.55}
+.rsteps li{margin:6px 0}
+.rtip{margin-top:12px;padding:10px 12px;border-radius:12px;background:var(--paper2);font-size:13px;line-height:1.45}
+
 /* editor */
 .tcard.new{border:1.5px dashed var(--green);background:transparent}
 .tcard.new .nm{color:var(--green)}
@@ -323,6 +339,7 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(-
 
 <div class="light" id="home"></div>
 <div class="light" id="lib" hidden></div>
+<div class="light" id="nutri" hidden></div>
 <nav class="tabbar" id="tabbar" aria-label="Secções">
   <div class="in">
     <button id="tabHome" aria-current="page">
@@ -332,6 +349,10 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(-
     <button id="tabLib">
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M3 4.5C5 3.5 8 3.5 10 5c2-1.5 5-1.5 7-.5v11c-2-1-5-1-7 .5-2-1.5-5-1.5-7-.5z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M10 5v11" stroke="currentColor" stroke-width="1.6"/></svg>
       Biblioteca
+    </button>
+    <button id="tabNutri">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 17c-3.5 0-6-2.5-6-6 0-2.5 1.5-4.5 3.5-5 1 0 1.8.3 2.5.8.7-.5 1.5-.8 2.5-.8 2 .5 3.5 2.5 3.5 5 0 3.5-2.5 6-6 6z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M10 6.5c0-2 1-3.5 3-3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      Nutrição
     </button>
   </div>
 </nav>
@@ -1449,6 +1470,71 @@ var TYPES = {
 };
 var TYPE_ORDER = ["legs","glutes","upper","push","pull","full","core","wod","circuit","cardio","quick"];
 
+/* ---------- NUTRIÇÃO ---------- */
+var NUTRI = {
+  intro: "Orientações gerais para quem treina 5 dias por semana e quer perder gordura sem perder músculo. Não substitui uma nutricionista: se tiveres alguma condição de saúde, fala com ela primeiro.",
+  sections: [
+    {key:"base", name:"Princípios", cards:[
+      {t:"Défice pequeno, não fome", b:"Para perder gordura e manter o músculo, comes um pouco menos do que gastas, não muito menos. Uma referência: 300 a 500 kcal abaixo do que precisas por dia. Mais do que isso e o corpo começa a gastar músculo e a energia no treino cai. Objetivo saudável: 0,3 a 0,5 kg por semana."},
+      {t:"Proteína em todas as refeições", b:"É o que protege o músculo quando estás em défice e o que mais sacia. Para 57 kg e treino forte: 100 a 115 g de proteína por dia, repartidos por 3 a 4 refeições de 25 a 35 g. Fontes: ovos, frango, peru, peixe, atum, iogurte grego, queijo fresco, skyr, tofu, lentilhas, grão."},
+      {t:"Hidratos à volta do treino", b:"Não cortes os hidratos: são o combustível dos WODs e das superséries. Põe a maior parte antes e depois do treino (aveia, arroz, batata, batata-doce, fruta, pão integral) e nas outras refeições dá prioridade a legumes e proteína."},
+      {t:"Gordura boa, em quantidade moderada", b:"Azeite, azeitonas, abacate, frutos secos, sementes, peixe gordo. Faz falta às hormonas e à saciedade, mas é densa em calorias: 1 colher de sopa de azeite são ~120 kcal. Mede em vez de despejar."},
+      {t:"Legumes a encher metade do prato", b:"Volume, fibra e poucas calorias. Metade do prato de legumes ou salada ao almoço e ao jantar é a forma mais fácil de comer menos sem sentir."},
+      {t:"Consistência > perfeição", b:"Não há alimentos proibidos. O que conta é o que fazes 80% do tempo. Uma refeição fora do plano não estraga a semana; o que estraga é desistir por causa dela."}
+    ]},
+    {key:"dia", name:"O dia", cards:[
+      {t:"Pequeno-almoço", b:"Proteína + hidrato lento + fruta. Ex.: iogurte grego com aveia e fruta, ovos mexidos com pão integral, papas de aveia com whey. Se treinas de manhã cedo, pode ser mais leve (ver «Antes do treino»)."},
+      {t:"Almoço e jantar", b:"A regra do prato: ½ legumes ou salada, ¼ proteína (uma palma da mão, 120 a 150 g), ¼ hidrato (um punho: arroz, massa, batata, leguminosas). Azeite 1 colher de sopa no total."},
+      {t:"Snacks", b:"Só se tiveres fome ou quando o intervalo entre refeições passa de 4 a 5 horas. Bons snacks: iogurte grego ou skyr, fruta com um punhado de frutos secos, queijo fresco, ovo cozido, húmus com cenoura, tosta integral com atum."},
+      {t:"Água", b:"2 a 2,5 litros por dia, mais 500 ml nos dias de treino. Um copo grande ao acordar e uma garrafa sempre por perto. Sede confunde-se muitas vezes com fome."},
+      {t:"Dia de descanso", b:"Nos dias sem treino, mantém a proteína e reduz um pouco os hidratos (menos arroz ou pão, mais legumes). Não é preciso «compensar» nem passar fome."},
+      {t:"Sono", b:"7 a 8 horas. Dormir mal aumenta a fome no dia seguinte (sobretudo de doces) e piora a recuperação. Faz parte do plano tanto como o treino."}
+    ]},
+    {key:"treino", name:"Antes e depois", cards:[
+      {t:"1 a 2 h antes do treino", b:"Refeição normal com hidrato e proteína, pouca gordura (digere mais devagar). Ex.: arroz com frango e legumes, pão integral com ovos, papas de aveia com iogurte."},
+      {t:"30 a 45 min antes", b:"Se não comeste há mais de 3 horas: algo leve e rápido, 1 banana, 2 tâmaras, uma tosta com compota, um iogurte com mel. Nos treinos de manhã cedo em jejum, um café e uma banana chegam para WODs curtos; para treinos de força longos, come."},
+      {t:"Nos 60 min depois", b:"Proteína (25 a 35 g) + hidrato. É quando o músculo mais aproveita. Ex.: batido de whey com banana e aveia, iogurte grego com granola e fruta, wrap de frango, arroz com atum. Não precisa de ser imediato, mas não deixes passar horas."},
+      {t:"Café e pré-treino", b:"Um café 30 a 60 min antes ajuda a energia e o foco nos WODs. Bebidas energéticas e pré-treinos em pó não são precisos; se usares, evita depois das 16h para não estragar o sono."},
+      {t:"Suplementos que fazem sentido", b:"Whey (proteína prática, não obrigatória), creatina (3 a 5 g por dia, todos os dias, ajuda força e recuperação; é dos poucos com muita evidência), vitamina D no inverno. O resto é dispensável."},
+      {t:"Sinais de que estás a comer pouco", b:"Pesos a descer semana após semana, cansaço permanente, sono mau, fome de noite, irritação. Se acontecer, sobe 200 a 300 kcal (hidratos à volta do treino) durante uma semana e vê como reages."}
+    ]},
+    {key:"dicas", name:"Dicas", cards:[
+      {t:"Prepara ao domingo", b:"Cozinha 2 proteínas (frango, ovos cozidos, atum), 1 hidrato (arroz, batata-doce, quinoa) e lava/corta legumes. Em 15 minutos montas as refeições da semana."},
+      {t:"Come devagar", b:"Pousa os talheres entre garfadas, mastiga bem. O sinal de saciedade demora 15 a 20 minutos a chegar ao cérebro. Comer devagar faz comer menos sem esforço."},
+      {t:"Começa pelos legumes", b:"Salada ou sopa primeiro, depois o resto. Chegas ao hidrato com menos fome."},
+      {t:"Doces", b:"Se apetecer, come 1 quadrado de chocolate negro (70%+), um iogurte com canela, fruta congelada triturada ou uma das receitas doces daqui. Proibir totalmente costuma acabar em exagero."},
+      {t:"Fora de casa", b:"Escolhe grelhados, peixe, saladas com proteína, sopa. Pede o molho à parte. Um copo de vinho está bem, o segundo já pesa (~120 kcal cada)."},
+      {t:"Bebidas", b:"Água, café, chá, infusões e água com gás com limão são livres. Sumos, refrigerantes e cerveja são calorias que não saciam. Um café com leite ok; um cappuccino de 400 ml com xarope é uma sobremesa."},
+      {t:"Pesa-te bem", b:"Uma vez por semana, de manhã, depois do WC, em jejum, sem roupa. O peso oscila 1 a 2 kg por dia com água, sal e ciclo. Olha para a tendência do mês, não para um dia. Fotos e roupa dizem tanto como a balança."},
+      {t:"Álcool", b:"Trava a queima de gordura enquanto o corpo o processa e piora o sono. Se beberes, planeia: 1 a 2 copos, água pelo meio, e não num dia de treino pesado."}
+    ]}
+  ],
+  meals: [["pa","Pequeno-almoço"],["al","Almoço"],["ja","Jantar"],["sn","Snack"],["pos","Pós-treino"],["doce","Doce saudável"]],
+  recipes: [
+    {n:"Papas de aveia proteicas", m:"pa", min:8, kcal:380, prot:30, ing:["50 g de aveia","200 ml de leite ou bebida vegetal","1 scoop de whey (30 g) ou 150 g de iogurte grego","1 banana ou punhado de frutos vermelhos","canela"], st:["Cozinha a aveia com o leite em lume brando 4 a 5 minutos, a mexer.","Tira do lume, deixa arrefecer 1 minuto e mistura a whey (se puseres com o lume ligado fica grumosa).","Cobre com fruta e canela."], tip:"Faz de véspera com iogurte em vez de cozinhar: aveia + iogurte + leite no frigorífico (overnight oats)."},
+    {n:"Ovos mexidos com espinafres e pão", m:"pa", min:8, kcal:360, prot:26, ing:["2 ovos + 2 claras","mão cheia de espinafres","1 fatia de pão integral ou de centeio","1 c. chá de azeite","sal, pimenta"], st:["Salteia os espinafres no azeite 1 minuto.","Junta os ovos batidos, lume brando, mexe devagar até cremosos.","Serve sobre o pão torrado."], tip:"Junta 30 g de queijo fresco ou 1/4 de abacate se precisares de mais gordura boa."},
+    {n:"Iogurte grego, granola e fruta", m:"pa", min:3, kcal:320, prot:24, ing:["200 g de iogurte grego magro ou skyr","30 g de granola pouco açucarada","fruta à escolha","1 c. chá de sementes de chia"], st:["Põe tudo numa taça, por camadas.","Se o iogurte for muito ácido, 1 c. chá de mel."], tip:"É também um bom pós-treino."},
+    {n:"Panquecas de banana e aveia", m:"pa", min:12, kcal:340, prot:22, ing:["1 banana madura","2 ovos","40 g de aveia","1 c. chá de fermento","canela","óleo de coco ou spray para untar"], st:["Tritura tudo (ou esmaga a banana e mistura à mão).","Frigideira antiaderente em lume médio, colheradas pequenas, 2 minutos por lado.","Serve com iogurte e fruta."], tip:"Faz o dobro e guarda no frigorífico; aquecem em 30 segundos."},
+    {n:"Bowl de arroz, frango e legumes", m:"al", min:20, kcal:480, prot:40, ing:["130 g de peito de frango","70 g de arroz (peso cru) ou 150 g cozido","brócolos, courgette, pimento","1 c. sopa de azeite","alho, paprica, limão"], st:["Corta o frango em tiras, tempera com paprica, alho e sal.","Grelha em frigideira quente 6 a 8 minutos.","Salteia os legumes 4 minutos. Monta com o arroz e rega com limão."], tip:"Cozinha 3 doses ao domingo. Aguenta 3 dias no frigorífico."},
+    {n:"Salada de atum, grão e ovo", m:"al", min:10, kcal:430, prot:38, ing:["1 lata de atum ao natural","150 g de grão cozido","1 ovo cozido","tomate, pepino, cebola roxa, rúcula","1 c. sopa de azeite, vinagre, orégãos"], st:["Mistura tudo numa taça grande.","Tempera e serve. Sem cozinhar."], tip:"Troca o atum por salmão de lata ou sardinha para variar."},
+    {n:"Wrap de peru e húmus", m:"al", min:6, kcal:400, prot:30, ing:["1 tortilha integral","100 g de peito de peru fatiado","2 c. sopa de húmus","alface, tomate, cenoura ralada","pimenta"], st:["Barra a tortilha com húmus.","Distribui o peru e os vegetais, enrola apertado.","Corta ao meio."], tip:"Bom para levar para o trabalho; embrulha em papel vegetal."},
+    {n:"Omelete de legumes com salada", m:"al", min:10, kcal:350, prot:26, ing:["3 ovos","cogumelos, pimento, cebola","30 g de queijo ralado (opcional)","salada verde","1 c. chá de azeite"], st:["Salteia os legumes 3 minutos.","Junta os ovos batidos, tapa, lume brando 4 minutos.","Dobra e serve com salada."], tip:"Com uma fatia de pão integral fica uma refeição completa de dia de treino."},
+    {n:"Salmão no forno com batata-doce", m:"ja", min:25, kcal:520, prot:36, ing:["150 g de salmão","200 g de batata-doce","espargos ou feijão-verde","1 c. sopa de azeite","limão, alho, ervas"], st:["Batata-doce em cubos com metade do azeite, forno a 200 °C 15 minutos.","Junta o salmão e os legumes ao tabuleiro, mais 10 a 12 minutos.","Limão por cima e serve."], tip:"Um tabuleiro só, quase sem loiça."},
+    {n:"Peito de peru com puré de couve-flor", m:"ja", min:20, kcal:380, prot:42, ing:["150 g de bife de peru","300 g de couve-flor","1 c. sopa de iogurte grego","alho, noz-moscada","salada ou legumes salteados"], st:["Coze a couve-flor 10 minutos, escorre bem, tritura com iogurte, alho e noz-moscada.","Grelha o peru 3 a 4 minutos por lado.","Serve com o puré e legumes."], tip:"O puré de couve-flor tem 1/4 das calorias do puré de batata e sabe quase igual."},
+    {n:"Chili de peru e feijão", m:"ja", min:30, kcal:450, prot:38, ing:["150 g de carne de peru picada","1 lata de feijão vermelho","1 lata de tomate pelado","cebola, alho, pimento","cominhos, paprica, malagueta"], st:["Refoga cebola e alho, junta a carne e sela.","Junta pimento, tomate, especiarias. 15 minutos em lume brando.","Junta o feijão nos últimos 5 minutos."], tip:"Rende 3 doses e congela bem. Serve com arroz nos dias de treino, com salada nos outros."},
+    {n:"Sopa de legumes com frango desfiado", m:"ja", min:30, kcal:320, prot:30, ing:["1 peito de frango","cenoura, alho-francês, courgette, abóbora","1 batata pequena","1 c. sopa de azeite","sal, coentros"], st:["Coze o frango e os legumes em água temperada 20 minutos.","Tira o frango, tritura a sopa, desfia o frango e volta a juntar.","Azeite e coentros a servir."], tip:"Jantar leve para dias de descanso ou quando o almoço foi grande."},
+    {n:"Massa integral com camarão e courgette", m:"ja", min:15, kcal:470, prot:32, ing:["70 g de massa integral","150 g de camarão","1 courgette em fios ou meias-luas","alho, malagueta, limão","1 c. sopa de azeite"], st:["Coze a massa. Salteia alho e malagueta no azeite, junta o camarão 2 minutos.","Junta a courgette 2 minutos e a massa escorrida.","Raspa de limão e serve."], tip:"Metade massa, metade courgette dá volume com menos calorias."},
+    {n:"Batido pós-treino", m:"pos", min:3, kcal:330, prot:32, ing:["1 scoop de whey (30 g)","1 banana","30 g de aveia","250 ml de leite ou água","gelo"], st:["Liquidificadora, 30 segundos."], tip:"Sem whey: 200 g de iogurte grego ou skyr no lugar."},
+    {n:"Tosta de atum e requeijão", m:"pos", min:5, kcal:300, prot:30, ing:["2 fatias de pão integral","1/2 lata de atum","2 c. sopa de requeijão ou queijo fresco","tomate, orégãos"], st:["Mistura o atum com o requeijão.","Barra o pão torrado, tomate por cima."], tip:"Pós-treino rápido quando não há tempo para cozinhar."},
+    {n:"Skyr com fruta e frutos secos", m:"sn", min:2, kcal:220, prot:20, ing:["150 g de skyr ou iogurte grego","fruta","10 amêndoas ou nozes"], st:["Mistura e come."], tip:"O snack mais fácil de sempre. Tem no frigorífico do trabalho."},
+    {n:"Húmus com palitos de legumes", m:"sn", min:5, kcal:180, prot:7, ing:["3 c. sopa de húmus","cenoura, pepino, pimento, aipo em palitos"], st:["Corta e molha."], tip:"Sacia sem pesar. Faz o húmus em casa: grão cozido, tahini, limão, alho, azeite, triturar."},
+    {n:"Ovos cozidos e fruta", m:"sn", min:10, kcal:200, prot:14, ing:["2 ovos","1 peça de fruta","sal, pimenta"], st:["Coze os ovos 9 minutos, arrefece em água fria.","Guarda com casca no frigorífico até 5 dias."], tip:"Coze 6 ao domingo."},
+    {n:"Gelado de banana", m:"doce", min:5, kcal:150, prot:3, ing:["2 bananas congeladas em rodelas","1 c. sopa de cacau em pó ou manteiga de amendoim","salpico de leite"], st:["Tritura as bananas congeladas até ficar cremoso (raspa as paredes 2 ou 3 vezes).","Junta o cacau ou a manteiga de amendoim."], tip:"Tem bananas cortadas sempre no congelador."},
+    {n:"Mousse de chocolate e iogurte", m:"doce", min:5, kcal:200, prot:18, ing:["150 g de iogurte grego","1 c. sopa de cacau em pó","1 c. chá de mel ou adoçante","1 quadrado de chocolate negro ralado"], st:["Mistura o iogurte com o cacau e o mel até ficar liso.","Chocolate ralado por cima. 10 minutos no frigorífico."], tip:"Mata a vontade de chocolate com 18 g de proteína."},
+    {n:"Maçã assada com canela", m:"doce", min:15, kcal:120, prot:1, ing:["1 maçã","canela","1 c. chá de mel","1 c. sopa de iogurte grego para servir"], st:["Corta a maçã ao meio, tira o caroço, canela e mel por cima.","Forno a 200 °C 12 minutos (ou micro-ondas 3 minutos).","Serve com iogurte."], tip:"Sabe a tarte de maçã sem a massa."}
+  ]
+};
+
 /* ---------- lookups ---------- */
 var EX = {};
 LIB.forEach(function(g){ g.items.forEach(function(it){ if(!EX[it[0]]) EX[it[0]] = {g:g.g, muscle:it[1], howto:it[2]||"", setup:it[3]||""}; }); });
@@ -1487,7 +1573,7 @@ function fig(name, extraClass){
 /* ---------- state ---------- */
 var KEY = "dfc1";
 var st = {loc:"gym", type:"legs", dur:"long", ver:{}, weights:{}, last:{}, sess:null, log:[], sound:false, keepAwake:true, ssMode:"alt", custom:{}};
-var ui = {tab:"home", filter:null, libLoc:null, search:"", rest:null, viewDone:null, confirmEnd:false};
+var ui = {tab:"home", filter:null, libLoc:null, search:"", rest:null, viewDone:null, confirmEnd:false, nsec:"base", nmeal:null, nq:""};
 try {
   var saved = JSON.parse(localStorage.getItem(KEY) || "null");
   if (saved){
@@ -1885,6 +1971,56 @@ function renderLib(){
   el.querySelectorAll("[data-lloc]").forEach(function(b){ b.addEventListener("click", function(){ ui.libLoc = b.getAttribute("data-lloc"); renderLib(); }); });
   el.querySelectorAll("[data-mu]").forEach(function(b){ b.addEventListener("click", function(){ var v = b.getAttribute("data-mu"); ui.filter = ui.filter === v ? null : v; renderLib(); }); });
   el.querySelectorAll("[data-ex]").forEach(function(b){ b.addEventListener("click", function(){ openSheet(b.getAttribute("data-ex"), null); }); });
+}
+
+/* ---------- NUTRIÇÃO ---------- */
+function renderNutri(){
+  var h = '<div class="wrap"><div class="top"><span class="eyebrow">Nutrição</span><span class="mono" style="font-size:11px;color:var(--muted)">' + NUTRI.recipes.length + ' receitas</span></div>';
+  h += '<div class="disp" style="font-size:40px;margin-top:10px">Comer para treinar</div>';
+  h += '<p class="note" style="margin:10px 2px 0">' + esc(NUTRI.intro) + '</p>';
+  h += '<div class="chips" role="group" aria-label="Secção">';
+  NUTRI.sections.forEach(function(sc){ h += '<button class="chip" data-nsec="' + sc.key + '" aria-pressed="' + (ui.nsec === sc.key) + '">' + esc(sc.name) + '</button>'; });
+  h += '<button class="chip" data-nsec="rec" aria-pressed="' + (ui.nsec === "rec") + '">Receitas</button></div>';
+  if (ui.nsec === "rec"){
+    h += '<input id="nSearch" class="search" type="search" placeholder="Procurar receita ou ingrediente" value="' + esc(ui.nq) + '">';
+    h += '<div class="chips" role="group" aria-label="Refeição">';
+    NUTRI.meals.forEach(function(m){ h += '<button class="chip" data-nmeal="' + m[0] + '" aria-pressed="' + (ui.nmeal === m[0]) + '">' + esc(m[1]) + '</button>'; });
+    h += '</div><div class="wlist" style="margin-top:8px">';
+    var q = ui.nq.trim().toLowerCase(), any = false;
+    NUTRI.recipes.forEach(function(r, i){
+      if (ui.nmeal && r.m !== ui.nmeal) return;
+      if (q && r.n.toLowerCase().indexOf(q) < 0 && !r.ing.some(function(x){ return x.toLowerCase().indexOf(q) >= 0; })) return;
+      any = true; var ml = NUTRI.meals.filter(function(m){ return m[0] === r.m; })[0];
+      h += '<button class="rrow" data-rec="' + i + '"><span><div class="nm">' + esc(r.n) + '</div><div class="mu">' + esc(ml ? ml[1] : "") + ' · ' + r.min + ' min</div></span><span class="kc">~' + r.kcal + ' kcal<br><b>' + r.prot + ' g prot.</b></span></button>';
+    });
+    if (!any) h += '<p class="empty">Nenhuma receita com isso.</p>';
+    h += '</div>';
+  } else {
+    var sec = NUTRI.sections.filter(function(x){ return x.key === ui.nsec; })[0] || NUTRI.sections[0];
+    h += '<div class="ncards">';
+    sec.cards.forEach(function(cd){ h += '<div class="ncard"><b>' + esc(cd.t) + '</b><p>' + esc(cd.b) + '</p></div>'; });
+    h += '</div>';
+  }
+  h += '</div>';
+  var el = document.getElementById("nutri"); el.innerHTML = h;
+  el.querySelectorAll("[data-nsec]").forEach(function(b){ b.addEventListener("click", function(){ ui.nsec = b.getAttribute("data-nsec"); renderNutri(); window.scrollTo(0, 0); }); });
+  el.querySelectorAll("[data-nmeal]").forEach(function(b){ b.addEventListener("click", function(){ var v = b.getAttribute("data-nmeal"); ui.nmeal = ui.nmeal === v ? null : v; renderNutri(); }); });
+  el.querySelectorAll("[data-rec]").forEach(function(b){ b.addEventListener("click", function(){ openRecipe(parseInt(b.getAttribute("data-rec"), 10)); }); });
+  var inp = document.getElementById("nSearch");
+  if (inp) inp.addEventListener("input", function(){ ui.nq = inp.value; var pos = inp.selectionStart; renderNutri(); var n = document.getElementById("nSearch"); n.focus(); try { n.setSelectionRange(pos, pos); } catch(e){} });
+}
+function openRecipe(i){
+  var r = NUTRI.recipes[i]; if (!r) return;
+  var ml = NUTRI.meals.filter(function(m){ return m[0] === r.m; })[0];
+  var h = '<div class="pan light" role="dialog" aria-modal="true" aria-label="' + esc(r.n) + '">';
+  h += '<div class="grab"><span class="eyebrow" style="color:var(--muted)">' + esc(ml ? ml[1] : "") + ' · ' + r.min + ' min</span>' + CLOSE_BTN + '</div>';
+  h += '<div class="disp" style="font-size:36px;margin-top:6px">' + esc(r.n) + '</div>';
+  h += '<div class="tiles"><div class="tile"><span>PROTEÍNA</span><b>' + r.prot + ' g</b></div><div class="tile"><span>CALORIAS</span><b>~' + r.kcal + '</b></div><div class="tile"><span>TEMPO</span><b>' + r.min + '′</b></div></div>';
+  h += '<div class="rowsx"><div class="rx"><span class="eyebrow">Precisas</span><span><ul class="rlist" style="margin-top:0">' + r.ing.map(function(x){ return '<li>' + esc(x) + '</li>'; }).join("") + '</ul></span></div>';
+  h += '<div class="rx"><span class="eyebrow">Como</span><span><ol class="rsteps" style="margin-top:0">' + r.st.map(function(x){ return '<li>' + esc(x) + '</li>'; }).join("") + '</ol></span></div></div>';
+  if (r.tip) h += '<div class="rtip"><b>Dica:</b> ' + esc(r.tip) + '</div>';
+  h += '</div>';
+  showSheet(h);
 }
 
 /* ---------- SHEET ---------- */
@@ -2580,13 +2716,16 @@ function setTab(t){
   ui.tab = t;
   document.getElementById("home").hidden = t !== "home";
   document.getElementById("lib").hidden = t !== "lib";
+  document.getElementById("nutri").hidden = t !== "nutri";
   document.getElementById("tabHome").setAttribute("aria-current", t === "home" ? "page" : "false");
   document.getElementById("tabLib").setAttribute("aria-current", t === "lib" ? "page" : "false");
-  if (t === "lib") renderLib(); else renderHome();
+  document.getElementById("tabNutri").setAttribute("aria-current", t === "nutri" ? "page" : "false");
+  if (t === "lib") renderLib(); else if (t === "nutri") renderNutri(); else renderHome();
   window.scrollTo(0, 0);
 }
 document.getElementById("tabHome").addEventListener("click", function(){ setTab("home"); });
 document.getElementById("tabLib").addEventListener("click", function(){ setTab("lib"); });
+document.getElementById("tabNutri").addEventListener("click", function(){ setTab("nutri"); });
 document.addEventListener("keydown", function(e){ if (e.key === "Escape" && !document.getElementById("sheet").hidden) closeSheet(); });
 
 renderHome();
