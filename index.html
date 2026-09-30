@@ -298,6 +298,32 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(-
 .rounds .step{width:52px;height:52px;font-size:26px;border-radius:14px}
 .wod-note{margin:0;font-size:13px;line-height:1.45;color:var(--nsoft)}
 
+/* programas */
+.plist{display:flex;flex-direction:column;gap:8px}
+.pcardp{width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;text-align:left;border:1px solid var(--line);border-radius:18px;background:var(--surface);padding:14px 14px;min-height:78px;font-family:inherit;color:var(--ink)}
+.pcardp .nm{display:block;font-family:var(--display);font-size:23px;font-weight:800;text-transform:uppercase;line-height:.95}
+.pcardp .fo{display:block;font-size:12px;color:var(--muted);margin-top:5px;line-height:1.3}
+.pcardp .pr{display:flex;flex-direction:column;align-items:flex-end;gap:5px}
+.pcardp .dots{display:flex;gap:4px}
+.pcardp .dots i{width:8px;height:8px;border-radius:50%;background:var(--line)}
+.pcardp .dots i.ok{background:var(--green)}
+.pcardp .dots i.cur{background:transparent;border:2px solid var(--green);width:6px;height:6px}
+.pcardp .ps{font-family:var(--mono);font-size:10.5px;color:var(--muted);white-space:nowrap}
+.pcardp .pl2{font-family:var(--mono);font-size:10px;color:var(--muted)}
+.pcardp[aria-pressed="true"]{background:var(--green-deep);border-color:var(--green-deep);color:var(--chalk);box-shadow:0 10px 24px rgba(31,30,42,.18)}
+.pcardp[aria-pressed="true"] .fo,.pcardp[aria-pressed="true"] .ps,.pcardp[aria-pressed="true"] .pl2{color:#B8B4BE}
+.pcardp[aria-pressed="true"] .dots i{background:var(--nline2)}
+.pcardp[aria-pressed="true"] .dots i.ok{background:var(--mint)}
+.pcardp[aria-pressed="true"] .dots i.cur{background:transparent;border-color:var(--mint)}
+.pquick{width:100%;margin-top:8px;display:flex;justify-content:space-between;align-items:center;gap:10px;text-align:left;border:1.5px dashed var(--line);border-radius:16px;background:transparent;padding:12px 14px;min-height:56px;font-family:inherit;color:var(--ink)}
+.pquick b{display:block;font-size:14px}
+.pquick span span{display:block;font-size:12px;color:var(--muted);margin-top:2px}
+.pquick .mono{font-size:12px;color:var(--muted)}
+.pquick[aria-pressed="true"]{border-style:solid;border-color:var(--green-deep);background:var(--green-deep);color:var(--chalk)}
+.pquick[aria-pressed="true"] span span,.pquick[aria-pressed="true"] .mono{color:#B8B4BE}
+.dur.stg button{font-family:var(--mono);font-size:14px;min-height:40px}
+.dur.stg button.done{color:var(--mint)}
+
 /* nutrição */
 .pcard{margin-top:14px;border-radius:18px;background:var(--green-deep);color:var(--chalk);padding:14px 16px;display:flex;gap:14px;align-items:center;box-shadow:0 10px 24px rgba(31,30,42,.18)}
 .pcard .ring{width:56px;height:56px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:18px;font-weight:800;position:relative}
@@ -1288,246 +1314,201 @@ function wodBlock(name, kind, opts, items, shortOpts){
   return b;
 }
 
+
+/* ================= PROGRAMAS =================
+   Cada programa = 5 etapas feitas por ordem (Etapa 1 → 5 → recomeça, ciclo +1).
+   Mesma lógica de treino: cardio no aquecimento, superséries, descansos curtos,
+   finisher WOD, alongamentos. Curto = sem bloco C e finisher mais curto. */
+var W_LEG = [["cardio_warm","3 min",3],["Ponte Glúteos (c/ Elástico nos joelhos)","1×15",2],["Monster Walk (c/ Elástico nos joelhos)","1×12 passos",2]];
+var W_LEG2 = [["cardio_warm2","3 min",3],["Clamshell c/ Mini Band","1×15/lado",2],["Alongamento do Mundo (World's Greatest)","1×5/lado",1]];
+var W_UP = [["cardio_warm2","3 min",3],["Pull Apart (c/ Elástico)","1×15",2],["Rotação Externa Ombro (c/ Elástico)","1×12/lado",2]];
+var W_FULL = [["cardio_warm","3 min",3],["Alongamento do Mundo (World's Greatest)","1×5/lado",1],["Agachamento (Peso Corporal)","1×12",2]];
+var W_CORE = [["cardio_warm","3 min",3],["Cat-Camel (Chão)","1×8",1],["Dead Bug (Chão)","1×8/lado",2]];
+var S_LEG = [["Alongamento Glúteo (Figura 4)","1×40s/lado",1],["Alongamento Flexores da Anca","1×40s/lado",1],["st_hams","1×30s/lado",1]];
+var S_LEG2 = [["Pigeon","1×40s/lado",1],["Alongamento Quadricípite (De Pé)","1×30s/lado",1],["Alongamento Gémeos (Parede)","1×30s/lado",1]];
+var S_UP = [["st_chest","1×40s/lado",1],["st_lats","1×40s",1],["Alongamento Tríceps e Ombro","1×30s/lado",1]];
+var S_FULL = [["Alongamento Flexores da Anca","1×40s/lado",1],["st_chest","1×30s/lado",1],["Postura da Criança","1×40s",1]];
+var CD_END = "Cardio · Final";
+
+function aq(items){ return {name:AQ, rest:"seguido", items:items}; }
+function al(items){ return {name:AL, rest:"respira fundo", items:items}; }
+function ss(name, rest, items, opt){ var b = {name:name, rest:rest, items:items}; if (opt === "long") b.short = false; return b; }
+function fin(kind, opts, items, sh){ return wodBlock(FIN, kind, opts, items, sh); }
+function cdEnd(pat, min){ return {name:CD_END, rest:"seguido", short:false, items:[[pat, min + " min", 7]]}; }
+function stage(title, blocks){ return {title:title, blocks:blocks}; }
+
+var REST_A = "A1 → 30s → A2 → 75s", REST_B = "B1 → 30s → B2 → 60s", REST_C = "C1 → 20s → C2 → 45s";
+var FL_A = "A1 → 15s → A2 → 45s", FL_B = "B1 → 15s → B2 → 45s", FL_C = "C1 → 15s → C2 → 30s";
+var ST_A = "A1 → 45s → A2 → 120s", ST_B = "B1 → 45s → B2 → 90s";
+
 var TYPES = {
-  legs: {name:"Pernas e glúteos", focus:"Agachar, hinge, unilateral", kind:"strength", versions:[
-    {blocks:[
-      {name:AQ, rest:"seguido", items:[["cardio_warm","3 min",2],["Ponte Glúteos (c/ Elástico nos joelhos)","1×15",2],["Alongamento do Mundo (World's Greatest)","1×5/lado",1]]},
-      {name:A, rest:RA, items:[["squat","4×8",9],["hamstring","4×12",8]]},
-      {name:B, rest:RB, short:false, items:[["bulgarian","3×10/lado",8],["glute_med","3×15",8]]},
-      {name:C, rest:RC, short:false, items:[["stepup","3×12/lado",8],["hamstring2","3×12",8]]},
-      wodBlock(FIN, "amrap", {min:10}, [["kb_swing","15 reps",8],["Jump Squats","10 reps",8],["Mountain Climbers","20 reps",8]], {min:7}),
-      {name:AL, rest:"respira fundo", items:[["Alongamento Flexores da Anca","1×40s/lado",1],["st_hams","1×40s/lado",1],["Alongamento Quadricípite (De Pé)","1×30s/lado",1]]}
-    ]},
-    {blocks:[
-      {name:AQ, rest:"seguido", items:[["cardio_warm2","3 min",2],["Monster Walk (c/ Elástico nos joelhos)","1×12 passos",2],["Agachamento (Peso Corporal)","1×12",2]]},
-      {name:A, rest:RA, items:[["rdl","4×10",9],["leg_press","4×12",8]]},
-      {name:B, rest:RB, short:false, items:[["lunge","3×10/lado",8],["kickback","3×12/lado",7]]},
-      {name:C, rest:RC, short:false, items:[["goblet","3×15",8],["glute_med","3×15",8]]},
-      wodBlock(FIN, "emom", {min:10}, [["Burpees","8 reps",8],["Afundo com Salto","12 reps",8]], {min:7}),
-      {name:AL, rest:"respira fundo", items:[["Alongamento Glúteo (Figura 4)","1×40s/lado",1],["Alongamento Flexores da Anca","1×40s/lado",1],["Alongamento Gémeos (Parede)","1×30s/lado",1]]}
-    ]},
-    {blocks:[
-      {name:AQ, rest:"seguido", items:[["cardio_warm","3 min",2],["Ponte Glúteos (c/ Elástico nos joelhos)","1×15",2],["Anca 90/90 (Chão/Transições)","1×6/lado",1]]},
-      {name:A, rest:RA, items:[["front_squat","4×8",9],["hip_thrust","4×10",9]]},
-      {name:B, rest:RB, short:false, items:[["stepup","3×10/lado",8],["hamstring2","3×12",8]]},
-      {name:C, rest:RC, short:false, items:[["lunge","3×12/lado",8],["kickback","3×15/lado",8]]},
-      wodBlock(FIN, "fortime", {cap:10, rounds:4}, [["Jump Squats","12 reps",8],["Skaters","20 reps",8],["Sit-Up","15 reps",7]], {cap:6, rounds:3}),
-      {name:AL, rest:"respira fundo", items:[["st_hams","1×40s/lado",1],["Pigeon","1×40s/lado",1],["Alongamento Quadricípite (De Pé)","1×30s/lado",1]]}
-    ]}
+  /* ---------- GLÚTEO REDONDO ---------- */
+  glutes: {name:"Glúteo redondo", focus:"Glúteos fortes e redondos, pernas firmes", goal:"4 etapas de glúteo e pernas com cargas altas + 1 de parte superior para equilibrar.", kind:"strength", versions:[
+    stage("Hip thrust pesado", [aq(W_LEG),
+      ss(A, REST_A, [["hip_thrust","4×8",9],["glute_med","4×15",8]]),
+      ss(B, REST_B, [["rdl","4×10",8],["kickback","3×15/lado",8]]),
+      ss(C, REST_C, [["bulgarian","3×12/lado",8],["Ponte Glúteos Unilateral","3×12/lado",8]], "long"),
+      fin("amrap", {min:10}, [["kb_swing","15 reps",8],["Jump Squats","10 reps",8],["Monster Walk (c/ Elástico nos joelhos)","12 passos",8]], {min:6}),
+      al(S_LEG)]),
+    stage("Unilateral e glúteo médio", [aq(W_LEG2),
+      ss(A, REST_A, [["bulgarian","4×10/lado",9],["glute_med2","3×15/lado",8]]),
+      ss(B, REST_B, [["sumo_dl","4×8",8],["hip_thrust_db","3×15",8]]),
+      ss(C, REST_C, [["stepup","3×10/lado",8],["Clamshell c/ Mini Band","2×20/lado",8]], "long"),
+      fin("emom", {min:10}, [["Afundo com Salto","12 reps",8],["kb_swing","15 reps",8]], {min:7}),
+      al(S_LEG2)]),
+    stage("Superior + core", [aq(W_UP),
+      ss(A, REST_A, [["pulldown","4×10",8],["bench","4×10",8]]),
+      ss(B, REST_B, [["row_db","3×12/lado",8],["ohp","3×10",8]]),
+      ss(C, REST_C, [["face_pull","3×15",7],["pallof","3×12/lado",8]], "long"),
+      fin("fortime", {cap:10, rounds:4}, [["Flexões (Padrão)","10 reps",8],["renegade","10 reps",8],["Mountain Climbers","20 reps",8]], {cap:6, rounds:3}),
+      al(S_UP)]),
+    stage("Hinge e posteriores", [aq(W_LEG),
+      ss(A, REST_A, [["deadlift","4×6",9],["hip_thrust","4×12",8]]),
+      ss(B, REST_B, [["hamstring","4×12",8],["pull_through","3×15",8]]),
+      ss(C, REST_C, [["lunge","3×12/lado",8],["glute_med","3×15",8]], "long"),
+      fin("circuit", {work:40, rest:20, rounds:3}, [["Ponte Glúteos Unilateral","40s",8],["Agachamento Sumo c/ Elástico","40s",8],["Kickback de Glúteo c/ Mini Band","40s",8],["Jump Squats","40s",8]], {rounds:2}),
+      al(S_LEG)]),
+    stage("Volume de glúteo", [aq(W_LEG2),
+      ss(A, REST_A, [["hip_thrust","4×12",9],["squat","4×10",8]]),
+      ss(B, REST_B, [["bulgarian","3×12/lado",8],["kickback","3×15/lado",8]]),
+      ss(C, REST_C, [["glute_med","3×20",8],["Hamstring Walkout","3×10",8]], "long"),
+      fin("amrap", {min:10}, [["Ponte Glúteos (c/ Elástico nos joelhos)","20 reps",8],["Afundo com Salto","12 reps",8],["kb_swing","15 reps",8]], {min:6}),
+      al(S_LEG2)])
   ]},
-  glutes: {name:"Glúteos em foco", focus:"Hip thrust, hinge, glúteo médio", kind:"strength", versions:[
-    {blocks:[
-      {name:AQ, rest:"seguido", items:[["cardio_warm","3 min",2],["Ponte Glúteos (c/ Elástico nos joelhos)","1×15",2],["Monster Walk (c/ Elástico nos joelhos)","1×12 passos",2]]},
-      {name:A, rest:RA, items:[["hip_thrust","4×10",8],["glute_med","4×15",8]]},
-      {name:B, rest:RB, short:false, items:[["rdl","3×10",8],["kickback","3×12/lado",8]]},
-      {name:C, rest:RC, short:false, items:[["bulgarian","3×12/lado",8],["glute_med2","3×15/lado",8]]},
-      wodBlock(FIN, "amrap", {min:10}, [["Ponte Glúteos (c/ Elástico nos joelhos)","15 reps",8],["Jump Squats","10 reps",8],["Monster Walk (c/ Elástico nos joelhos)","10 passos",7]], {min:7}),
-      {name:AL, rest:"respira fundo", items:[["Alongamento Glúteo (Figura 4)","1×40s/lado",1],["Alongamento Flexores da Anca","1×40s/lado",1],["Pigeon","1×30s/lado",1]]}
-    ]},
-    {blocks:[
-      {name:AQ, rest:"seguido", items:[["cardio_warm2","3 min",2],["Clamshell c/ Mini Band","1×15/lado",2],["Ponte Glúteos (c/ Elástico nos joelhos)","1×12",2]]},
-      {name:A, rest:RA, items:[["sumo_dl","4×8",9],["bulgarian","4×10/lado",9]]},
-      {name:B, rest:RB, short:false, items:[["hip_thrust_db","3×15",8],["glute_med2","3×15/lado",8]]},
-      {name:C, rest:RC, short:false, items:[["pull_through","3×15",8],["kickback","3×15/lado",8]]},
-      wodBlock(FIN, "emom", {min:10}, [["kb_swing","15 reps",8],["Afundo com Salto","10 reps",8]], {min:7}),
-      {name:AL, rest:"respira fundo", items:[["Pigeon","1×40s/lado",1],["st_hams","1×40s/lado",1],["Alongamento Glúteo (Figura 4)","1×30s/lado",1]]}
-    ]},
-    {blocks:[
-      {name:AQ, rest:"seguido", items:[["cardio_warm","3 min",2],["Monster Walk (c/ Elástico nos joelhos)","1×12 passos",2],["Agachamento (Peso Corporal)","1×12",2]]},
-      {name:A, rest:RA, items:[["hip_thrust","4×12",9],["pull_through","4×12",8]]},
-      {name:B, rest:RB, short:false, items:[["stepup","3×12/lado",8],["adductor","3×15",7]]},
-      {name:C, rest:RC, short:false, items:[["hamstring","3×12",8],["glute_med","3×15",8]]},
-      wodBlock(FIN, "circuit", {work:40, rest:20, rounds:3}, [["Ponte Glúteos Unilateral","40s/lado",8],["Agachamento Sumo c/ Elástico","40s",8],["Kickback de Glúteo c/ Mini Band","40s/lado",8],["Jump Squats","40s",8]], {rounds:2}),
-      {name:AL, rest:"respira fundo", items:[["Alongamento Flexores da Anca","1×40s/lado",1],["Alongamento Glúteo (Figura 4)","1×40s/lado",1],["Postura da Criança","1×40s",1]]}
-    ]}
+
+  /* ---------- PERDA DE PESO ---------- */
+  fatloss: {name:"Perda de peso", focus:"Queimar mais, perder gordura sem perder músculo", goal:"Corpo inteiro com descansos curtos, superséries rápidas, finishers longos e 1 etapa de cardio intervalado.", kind:"strength", versions:[
+    stage("Corpo inteiro · superséries", [aq(W_FULL),
+      ss(A, FL_A, [["squat","4×10",8],["row_db","4×10/lado",8]]),
+      ss(B, FL_B, [["rdl","4×10",8],["bench","4×10",8]]),
+      ss(C, FL_C, [["lunge","3×12/lado",8],["pallof","3×12/lado",8]], "long"),
+      fin("amrap", {min:12}, [["Burpees","8 reps",9],["kb_swing","15 reps",8],["Mountain Climbers","20 reps",8]], {min:7}),
+      al(S_FULL)]),
+    stage("Circuito metabólico", [aq(W_FULL),
+      wodBlock("Circuito", "circuit", {work:40, rest:20, rounds:5}, [["goblet","40s",8],["Flexões (Padrão)","40s",8],["kb_swing","40s",9],["row_db","40s",8],["Mountain Climbers","40s",8],["Prancha (Frontal)","40s",7]], {rounds:3}),
+      fin("emom", {min:8}, [["Burpees","10 reps",9],["Jump Squats","15 reps",8]], {min:6}),
+      al(S_FULL)]),
+    stage("Pernas + cardio", [aq(W_LEG),
+      ss(A, FL_A, [["goblet","4×15",8],["hip_thrust","4×12",8]]),
+      ss(B, FL_B, [["lunge","4×12/lado",8],["hamstring","3×12",8]]),
+      ss(C, FL_C, [["stepup","3×12/lado",8],["glute_med","3×20",8]], "long"),
+      fin("fortime", {cap:12, rounds:5}, [["box_jump","10 reps",9],["kb_swing","15 reps",8],["Skaters","20 reps",8]], {cap:7, rounds:3}),
+      cdEnd("cardio_int", 5), al(S_LEG)]),
+    stage("Superior + core metabólico", [aq(W_UP),
+      ss(A, FL_A, [["pulldown","4×12",8],["incline","4×12",8]]),
+      ss(B, FL_B, [["row_cable","4×12",8],["ohp2","3×12",8]]),
+      ss(C, FL_C, [["renegade","3×10",8],["cable_crunch","3×15",8]], "long"),
+      fin("amrap", {min:12}, [["thruster","10 reps",9],["Mountain Climbers","20 reps",8],["V-Up","10 reps",8]], {min:7}),
+      al(S_UP)]),
+    stage("Intervalos + WOD", [aq([["cardio_warm","5 min",3],["Agachamento (Peso Corporal)","1×15",2],["Polichinelos","1×30",3]]),
+      {name:"Cardio · Intervalos", rest:"seguido", items:[["cardio_int","10 min",9]], short:{items:[["cardio_int","8 min",9]]}},
+      wodBlock("WOD · For Time", "fortime", {cap:15, rounds:5}, [["wall_ball","15 reps",9],["Burpees","10 reps",9],["kb_swing","15 reps",8],["Sit-Up","15 reps",8]], {cap:10, rounds:3}),
+      cdEnd("cardio_int2", 8), al(S_FULL)])
   ]},
-  upper: {name:"Parte superior", focus:"Costas, peito, ombros, braços", kind:"strength", versions:[
-    {blocks:[
-      {name:AQ, rest:"seguido", items:[["cardio_warm2","3 min",2],["Pull Apart (c/ Elástico)","1×15",2],["Rotação Externa Ombro (c/ Elástico)","1×12/lado",2]]},
-      {name:A, rest:RA, items:[["bench","4×10",9],["row_cable","4×12",8]]},
-      {name:B, rest:RB, short:false, items:[["ohp","3×10",8],["pulldown","3×12",8]]},
-      {name:C, rest:RC, short:false, items:[["lat_raise","3×15",8],["triceps","3×12",8]]},
-      wodBlock(FIN, "amrap", {min:10}, [["Flexões (Padrão)","8 reps",8],["renegade","10 reps",8],["Polichinelos","20 reps",7]], {min:7}),
-      {name:AL, rest:"respira fundo", items:[["st_chest","1×40s/lado",1],["st_lats","1×40s",1],["Alongamento Tríceps e Ombro","1×30s/lado",1]]}
-    ]},
-    {blocks:[
-      {name:AQ, rest:"seguido", items:[["cardio_warm","3 min",2],["Pull Apart (c/ Elástico)","1×15",2],["Cat-Camel (Chão)","1×8",1]]},
-      {name:A, rest:RA, items:[["pulldown_close","4×10",9],["incline","4×10",8]]},
-      {name:B, rest:RB, short:false, items:[["face_pull","3×15",7],["biceps","3×12",8]]},
-      {name:C, rest:RC, short:false, items:[["row_db","3×12/lado",8],["fly","3×15",8]]},
-      wodBlock(FIN, "emom", {min:10}, [["Burpees","8 reps",8],["Prancha c/ Toque Ombro","20 reps",7]], {min:7}),
-      {name:AL, rest:"respira fundo", items:[["st_lats","1×40s",1],["st_chest","1×40s/lado",1],["Postura da Criança","1×40s",1]]}
-    ]},
-    {blocks:[
-      {name:AQ, rest:"seguido", items:[["cardio_warm2","3 min",2],["Rotação Externa Ombro (c/ Elástico)","1×12/lado",2],["Flexões em Incline","1×10",2]]},
-      {name:A, rest:RA, items:[["row_db","4×10/lado",9],["chest_press","4×12",8]]},
-      {name:B, rest:RB, short:false, items:[["lat_raise","3×15",8],["triceps","3×12",8]]},
-      {name:C, rest:RC, short:false, items:[["face_pull","3×15",7],["biceps2","3×12",8]]},
-      wodBlock(FIN, "fortime", {cap:10, rounds:4}, [["Flexões (Padrão)","10 reps",8],["Mountain Climbers","20 reps",8],["Sit-Up","15 reps",7]], {cap:6, rounds:3}),
-      {name:AL, rest:"respira fundo", items:[["st_chest","1×40s/lado",1],["Alongamento Tríceps e Ombro","1×30s/lado",1],["Rotação Torácica (Chão)","1×8/lado",1]]}
-    ]}
+
+  /* ---------- GANHAR FORÇA ---------- */
+  strength: {name:"Ganhar força", focus:"Pesos a subir nos básicos: squat, deadlift, hip thrust, supino", goal:"Poucas repetições e cargas altas nos básicos, descansos maiores, finisher curto.", kind:"strength", versions:[
+    stage("Squat pesado", [aq(W_LEG),
+      ss(A, ST_A, [["squat","5×5",9],["pullup","4×6",8]]),
+      ss(B, ST_B, [["rdl","4×6",8],["ohp","4×6",8]]),
+      ss(C, REST_C, [["bulgarian","3×8/lado",8],["farmer","3×40s",8]], "long"),
+      fin("emom", {min:8}, [["kb_swing","12 reps",8],["Prancha (Frontal)","40s",8]], {min:6}),
+      al(S_LEG)]),
+    stage("Supino e remada", [aq(W_UP),
+      ss(A, ST_A, [["bench","5×5",9],["row_chest","5×6",8]]),
+      ss(B, ST_B, [["incline","4×6",8],["pulldown","4×8",8]]),
+      ss(C, REST_C, [["dips","3×8",8],["hammer","3×10",8]], "long"),
+      fin("amrap", {min:6}, [["Flexões (Padrão)","8 reps",8],["renegade","8 reps",8]], {min:5}),
+      al(S_UP)]),
+    stage("Deadlift pesado", [aq(W_LEG2),
+      ss(A, ST_A, [["deadlift","5×4",9],["hanging_knee","4×10",8]]),
+      ss(B, ST_B, [["front_squat","4×6",8],["hamstring","4×8",8]]),
+      ss(C, REST_C, [["hip_thrust_db","3×10",8],["pallof","3×10/lado",8]], "long"),
+      fin("emom", {min:8}, [["box_jump","6 reps",8],["farmer","40s",8]], {min:6}),
+      al(S_LEG2)]),
+    stage("Hip thrust e ombros", [aq(W_LEG),
+      ss(A, ST_A, [["hip_thrust","5×6",9],["ohp","5×5",9]]),
+      ss(B, ST_B, [["sumo_dl","4×6",8],["pullup","4×6",8]]),
+      ss(C, REST_C, [["lunge","3×8/lado",8],["lat_raise","3×12",8]], "long"),
+      fin("amrap", {min:6}, [["thruster","8 reps",8],["Sit-Up","12 reps",8]], {min:5}),
+      al(S_FULL)]),
+    stage("Corpo inteiro pesado", [aq(W_FULL),
+      ss(A, ST_A, [["front_squat","5×5",9],["bench","5×5",9]]),
+      ss(B, ST_B, [["rdl","4×6",8],["row_db","4×8/lado",8]]),
+      ss(C, REST_C, [["farmer","3×40s",8],["cable_crunch","3×12",8]], "long"),
+      fin("fortime", {cap:8, rounds:3}, [["kb_swing","10 reps",8],["Flexões (Padrão)","8 reps",8],["Jump Squats","8 reps",8]], {cap:6, rounds:2}),
+      al(S_LEG)])
   ]},
-  push: {name:"Empurrar", focus:"Peito, ombros, tríceps", kind:"strength", versions:[
-    {blocks:[
-      {name:AQ, rest:"seguido", items:[["cardio_warm","3 min",2],["Pull Apart (c/ Elástico)","1×15",2],["Flexões em Incline","1×10",2]]},
-      {name:A, rest:RA, items:[["bench","4×10",9],["ohp","4×10",8]]},
-      {name:B, rest:RB, short:false, items:[["fly","3×12",8],["triceps","3×12",8]]},
-      {name:C, rest:RC, short:false, items:[["pushup_hard","3×12",8],["lat_raise","3×15",8]]},
-      wodBlock(FIN, "amrap", {min:10}, [["Flexões (Padrão)","8 reps",8],["Jump Squats","10 reps",8],["Pike Push-Up","6 reps",8]], {min:7}),
-      {name:AL, rest:"respira fundo", items:[["st_chest","1×40s/lado",1],["Alongamento Tríceps e Ombro","1×30s/lado",1],["Postura da Criança","1×40s",1]]}
-    ]},
-    {blocks:[
-      {name:AQ, rest:"seguido", items:[["cardio_warm2","3 min",2],["Rotação Externa Ombro (c/ Elástico)","1×12/lado",2],["Pull Apart (c/ Elástico)","1×15",2]]},
-      {name:A, rest:RA, items:[["incline","4×10",9],["ohp2","4×12",8]]},
-      {name:B, rest:RB, short:false, items:[["dips","3×12",8],["lat_raise","3×15",8]]},
-      {name:C, rest:RC, short:false, items:[["fly","3×15",8],["triceps2","3×12",8]]},
-      wodBlock(FIN, "emom", {min:10}, [["Burpees","8 reps",8],["Flexões Diamante","8 reps",8]], {min:7}),
-      {name:AL, rest:"respira fundo", items:[["st_chest","1×40s/lado",1],["st_lats","1×40s",1],["Alongamento Tríceps e Ombro","1×30s/lado",1]]}
-    ]},
-    {blocks:[
-      {name:AQ, rest:"seguido", items:[["cardio_warm","3 min",2],["Cat-Camel (Chão)","1×8",1],["Flexões em Incline","1×10",2]]},
-      {name:A, rest:RA, items:[["chest_press","4×12",9],["pushup_hard","4×10",9]]},
-      {name:B, rest:RB, short:false, items:[["ohp","3×10",8],["triceps2","3×12",8]]},
-      {name:C, rest:RC, short:false, items:[["incline","3×12",8],["dips","3×12",8]]},
-      wodBlock(FIN, "fortime", {cap:10, rounds:4}, [["wall_ball","12 reps",8],["Flexões (Padrão)","10 reps",8],["Mountain Climbers","20 reps",8]], {cap:6, rounds:3}),
-      {name:AL, rest:"respira fundo", items:[["st_chest","1×40s/lado",1],["Alongamento Tríceps e Ombro","1×30s/lado",1],["Rotação Torácica (Chão)","1×8/lado",1]]}
-    ]}
+
+  /* ---------- TONIFICAR ---------- */
+  tone: {name:"Tonificar e definir", focus:"Corpo equilibrado, firme e definido", goal:"8 a 15 repetições, superséries em todos os blocos, corpo todo em 5 etapas.", kind:"strength", versions:[
+    stage("Pernas e glúteos", [aq(W_LEG),
+      ss(A, REST_A, [["squat","4×10",8],["hamstring","4×12",8]]),
+      ss(B, REST_B, [["hip_thrust","4×12",8],["glute_med","3×15",8]]),
+      ss(C, REST_C, [["lunge","3×12/lado",8],["quad_iso","3×15",8]], "long"),
+      fin("amrap", {min:10}, [["kb_swing","15 reps",8],["Jump Squats","10 reps",8],["Mountain Climbers","20 reps",8]], {min:6}),
+      al(S_LEG)]),
+    stage("Costas e braços", [aq(W_UP),
+      ss(A, REST_A, [["pulldown","4×10",8],["row_db","4×10/lado",8]]),
+      ss(B, REST_B, [["face_pull","3×15",7],["biceps","3×12",8]]),
+      ss(C, REST_C, [["rear_delt","3×15",7],["triceps","3×12",8]], "long"),
+      fin("emom", {min:10}, [["Burpees","8 reps",8],["renegade","10 reps",8]], {min:7}),
+      al(S_UP)]),
+    stage("Corpo inteiro", [aq(W_FULL),
+      ss(A, REST_A, [["rdl","4×10",8],["incline","4×10",8]]),
+      ss(B, REST_B, [["bulgarian","3×10/lado",8],["row_cable","3×12",8]]),
+      ss(C, REST_C, [["kickback","3×15/lado",8],["pallof","3×12/lado",8]], "long"),
+      fin("fortime", {cap:10, rounds:4}, [["thruster","10 reps",8],["Flexões (Padrão)","10 reps",8],["Sit-Up","15 reps",8]], {cap:6, rounds:3}),
+      al(S_FULL)]),
+    stage("Peito, ombros e core", [aq(W_UP),
+      ss(A, REST_A, [["bench","4×10",8],["ohp","4×10",8]]),
+      ss(B, REST_B, [["fly","3×15",8],["lat_raise","3×15",8]]),
+      ss(C, REST_C, [["dips","3×12",8],["cable_crunch","3×15",8]], "long"),
+      fin("circuit", {work:40, rest:20, rounds:3}, [["Prancha (Frontal)","40s",8],["Mountain Climbers","40s",8],["Flexões (Padrão)","40s",8],["Bicicleta (Abdominal)","40s",8]], {rounds:2}),
+      al(S_UP)]),
+    stage("Glúteo e posteriores", [aq(W_LEG2),
+      ss(A, REST_A, [["hip_thrust","4×12",8],["rdl","4×10",8]]),
+      ss(B, REST_B, [["stepup","3×12/lado",8],["glute_med2","3×15/lado",8]]),
+      ss(C, REST_C, [["pull_through","3×15",8],["adductor","3×15",8]], "long"),
+      fin("amrap", {min:10}, [["Ponte Glúteos (c/ Elástico nos joelhos)","20 reps",8],["Skaters","20 reps",8],["kb_swing","15 reps",8]], {min:6}),
+      al(S_LEG2)])
   ]},
-  pull: {name:"Puxar", focus:"Costas, ombro posterior, bíceps", kind:"strength", versions:[
-    {blocks:[
-      {name:AQ, rest:"seguido", items:[["cardio_warm2","3 min",2],["Pull Apart (c/ Elástico)","1×15",2],["Cat-Camel (Chão)","1×8",1]]},
-      {name:A, rest:RA, items:[["pulldown","4×10",9],["row_db","4×10/lado",8]]},
-      {name:B, rest:RB, short:false, items:[["face_pull","3×15",7],["biceps","3×12",8]]},
-      {name:C, rest:RC, short:false, items:[["rear_delt","3×15",7],["hammer","3×12",8]]},
-      wodBlock(FIN, "amrap", {min:10}, [["kb_swing","15 reps",8],["renegade","10 reps",8],["Joelhos ao Peito","30 reps",7]], {min:7}),
-      {name:AL, rest:"respira fundo", items:[["st_lats","1×40s",1],["st_chest","1×40s/lado",1],["Postura da Criança","1×40s",1]]}
-    ]},
-    {blocks:[
-      {name:AQ, rest:"seguido", items:[["cardio_warm","3 min",2],["Rotação Externa Ombro (c/ Elástico)","1×12/lado",2],["Dead Hang (Rack)","1×20s",2]]},
-      {name:A, rest:RA, items:[["pullup","4×6",9],["row_chest","4×12",8]]},
-      {name:B, rest:RB, short:false, items:[["rear_delt","3×15",7],["hammer","3×12",8]]},
-      {name:C, rest:RC, short:false, items:[["pulldown","3×12",8],["biceps2","3×12",8]]},
-      wodBlock(FIN, "emom", {min:10}, [["Burpees","8 reps",8],["Superman","12 reps",7]], {min:7}),
-      {name:AL, rest:"respira fundo", items:[["st_lats","1×40s",1],["Rotação Torácica (Chão)","1×8/lado",1],["Alongamento Tríceps e Ombro","1×30s/lado",1]]}
-    ]},
-    {blocks:[
-      {name:AQ, rest:"seguido", items:[["cardio_warm2","3 min",2],["Pull Apart (c/ Elástico)","1×15",2],["Bird Dog (Chão)","1×8/lado",2]]},
-      {name:A, rest:RA, items:[["row_cable","4×12",9],["pulldown_close","4×10",8]]},
-      {name:B, rest:RB, short:false, items:[["face_pull","3×15",7],["biceps2","3×12",8]]},
-      {name:C, rest:RC, short:false, items:[["row_db","3×12/lado",8],["rear_delt","3×15",7]]},
-      wodBlock(FIN, "fortime", {cap:10, rounds:4}, [["row_cal","45s",8],["Sit-Up","15 reps",7],["Jump Squats","10 reps",8]], {cap:6, rounds:3}),
-      {name:AL, rest:"respira fundo", items:[["st_lats","1×40s",1],["st_chest","1×40s/lado",1],["Postura da Criança","1×40s",1]]}
-    ]}
+
+  /* ---------- CORE E POSTURA ---------- */
+  core: {name:"Core e postura", focus:"Abdominal forte, costas saudáveis, postura direita", goal:"Core em todos os ângulos, costas e glúteo médio, com mais mobilidade.", kind:"core", versions:[
+    stage("Anti-extensão", [aq(W_CORE),
+      ss("Core · Bloco 1", "30s", [["Prancha (Frontal)","4×45s",8],["row_db","3×12/lado",8]]),
+      ss("Core · Bloco 2", "30s", [["Dead Bug (Chão)","3×10/lado",8],["face_pull","3×15",7]]),
+      ss("Core · Bloco 3", "30s", [["Hollow Hold","3×30s",8],["Superman","3×12",7]], "long"),
+      fin("amrap", {min:8}, [["Mountain Climbers","20 reps",8],["Sit-Up","12 reps",8],["Prancha c/ Toque Ombro","16 reps",8]], {min:5}),
+      al([["Postura da Criança","1×40s",1],["Cat-Camel (Chão)","1×8",1],["Rotação Torácica (Chão)","1×8/lado",1]])]),
+    stage("Anti-rotação", [aq(W_CORE),
+      ss("Core · Bloco 1", "30s", [["pallof","4×12/lado",8],["Prancha Lateral (Cada lado)","3×35s/lado",8]]),
+      ss("Core · Bloco 2", "30s", [["woodchop","3×12/lado",8],["Bird Dog (Chão)","3×10/lado",7]]),
+      ss("Core · Bloco 3", "30s", [["renegade","3×10",8],["farmer","3×40s",8]], "long"),
+      fin("emom", {min:8}, [["Russian Twist","20 reps",8],["Hollow Hold","30s",8]], {min:6}),
+      al([["Rotação Torácica (Chão)","1×8/lado",1],["Anca 90/90 (Chão/Transições)","1×6/lado",1],["Postura da Criança","1×40s",1]])]),
+    stage("Costas e postura", [aq(W_UP),
+      ss(A, REST_A, [["row_cable","4×12",8],["face_pull","4×15",7]]),
+      ss(B, REST_B, [["pulldown","3×12",8],["rear_delt","3×15",7]]),
+      ss("Core · Bloco 3", "30s", [["Superman","3×12",7],["Dead Bug (Chão)","3×10/lado",8]], "long"),
+      fin("circuit", {work:40, rest:20, rounds:2}, [["Prancha (Frontal)","40s",8],["Bird Dog (Chão)","40s",7],["Prancha Lateral (Cada lado)","40s",8],["Superman","40s",7]], {rounds:1}),
+      al(S_UP)]),
+    stage("Flexão e oblíquos", [aq(W_CORE),
+      ss("Core · Bloco 1", "30s", [["cable_crunch","4×15",8],["Prancha Lateral (Cada lado)","3×40s/lado",8]]),
+      ss("Core · Bloco 2", "30s", [["hanging_knee","3×12",8],["Russian Twist","3×20",8]]),
+      ss("Core · Bloco 3", "30s", [["V-Up","3×12",8],["Bicicleta (Abdominal)","3×20",8]], "long"),
+      fin("amrap", {min:8}, [["Sit-Up","15 reps",8],["Mountain Climbers","20 reps",8],["Prancha (Frontal)","30s",8]], {min:5}),
+      al([["Postura da Criança","1×40s",1],["Alongamento Flexores da Anca","1×30s/lado",1],["Cat-Camel (Chão)","1×8",1]])]),
+    stage("Glúteo médio e estabilidade", [aq(W_LEG2),
+      ss(A, REST_A, [["glute_med","4×15",8],["RDL Unilateral (Peso Corporal)","3×10/lado",8]]),
+      ss(B, REST_B, [["bulgarian","3×10/lado",8],["pallof","3×12/lado",8]]),
+      ss("Core · Bloco 3", "30s", [["Clamshell c/ Mini Band","3×20/lado",8],["Hollow Hold","3×30s",8]], "long"),
+      fin("emom", {min:8}, [["Monster Walk (c/ Elástico nos joelhos)","12 passos",8],["Prancha c/ Toque Ombro","16 reps",8]], {min:6}),
+      al(S_LEG2)])
   ]},
-  full: {name:"Corpo inteiro", focus:"Um padrão de cada, tudo num só treino", kind:"strength", versions:[
-    {blocks:[
-      {name:AQ, rest:"seguido", items:[["cardio_warm","3 min",2],["Alongamento do Mundo (World's Greatest)","1×5/lado",1],["Ponte Glúteos (c/ Elástico nos joelhos)","1×12",2]]},
-      {name:A, rest:RA, items:[["squat","4×8",9],["row_db","4×10/lado",8]]},
-      {name:B, rest:RB, short:false, items:[["bench","3×10",8],["rdl","3×10",8]]},
-      {name:C, rest:RC, short:false, items:[["lunge","3×12/lado",8],["pallof","3×12/lado",8]]},
-      wodBlock(FIN, "amrap", {min:10}, [["Burpees","6 reps",8],["kb_swing","12 reps",8],["Sit-Up","12 reps",7]], {min:7}),
-      {name:AL, rest:"respira fundo", items:[["Alongamento Flexores da Anca","1×40s/lado",1],["st_chest","1×40s/lado",1],["st_hams","1×30s/lado",1]]}
-    ]},
-    {blocks:[
-      {name:AQ, rest:"seguido", items:[["cardio_warm2","3 min",2],["Cat-Camel (Chão)","1×8",1],["Monster Walk (c/ Elástico nos joelhos)","1×12 passos",2]]},
-      {name:A, rest:RA, items:[["deadlift","4×6",9],["ohp","4×10",8]]},
-      {name:B, rest:RB, short:false, items:[["goblet","3×12",8],["pulldown","3×12",8]]},
-      {name:C, rest:RC, short:false, items:[["hip_thrust_db","3×15",8],["face_pull","3×15",7]]},
-      wodBlock(FIN, "emom", {min:10}, [["thruster","10 reps",8],["Mountain Climbers","30 reps",8]], {min:7}),
-      {name:AL, rest:"respira fundo", items:[["st_hams","1×40s/lado",1],["st_lats","1×40s",1],["Alongamento Glúteo (Figura 4)","1×30s/lado",1]]}
-    ]},
-    {blocks:[
-      {name:AQ, rest:"seguido", items:[["cardio_warm","3 min",2],["Anca 90/90 (Chão/Transições)","1×6/lado",1],["Pull Apart (c/ Elástico)","1×15",2]]},
-      {name:A, rest:RA, items:[["hip_thrust","4×10",9],["incline","4×10",8]]},
-      {name:B, rest:RB, short:false, items:[["bulgarian","3×10/lado",8],["row_cable","3×12",8]]},
-      {name:C, rest:RC, short:false, items:[["kb_swing","3×15",8],["hanging_knee","3×12",8]]},
-      wodBlock(FIN, "fortime", {cap:10, rounds:4}, [["box_jump","10 reps",8],["Flexões (Padrão)","8 reps",8],["Skaters","20 reps",8]], {cap:6, rounds:3}),
-      {name:AL, rest:"respira fundo", items:[["Alongamento Flexores da Anca","1×40s/lado",1],["st_chest","1×40s/lado",1],["Postura da Criança","1×40s",1]]}
-    ]}
-  ]},
-  core: {name:"Core e abdominal", focus:"Anti-extensão, anti-rotação, flexão, lateral", kind:"core", versions:[
-    {blocks:[
-      {name:AQ, rest:"seguido", items:[["cardio_warm","3 min",2],["Cat-Camel (Chão)","1×8",1],["Dead Bug (Chão)","1×8/lado",2]]},
-      {name:"Core · Bloco 1", rest:"30s", items:[["Prancha (Frontal)","3×40s",7],["pallof","3×10/lado",7]]},
-      {name:"Core · Bloco 2", rest:"30s", items:[["cable_crunch","3×15",8],["Prancha Lateral (Cada lado)","3×40s/lado",8]]},
-      {name:"Core · Bloco 3", rest:"30s", short:false, items:[["Hollow Hold","3×30s",8],["Bird Dog (Chão)","3×10/lado",6]]},
-      wodBlock(FIN, "amrap", {min:6}, [["Mountain Climbers","20 reps",8],["Sit-Up","12 reps",7],["Prancha c/ Toque Ombro","16 reps",7]], {min:4}),
-      {name:AL, rest:"respira fundo", items:[["Postura da Criança","1×40s",1],["Rotação Torácica (Chão)","1×8/lado",1],["Alongamento Flexores da Anca","1×30s/lado",1]]}
-    ]},
-    {blocks:[
-      {name:AQ, rest:"seguido", items:[["cardio_warm2","3 min",2],["Bird Dog (Chão)","1×8/lado",2],["Cat-Camel (Chão)","1×8",1]]},
-      {name:"Core · Bloco 1", rest:"30s", items:[["Dead Bug (Chão)","3×10/lado",7],["woodchop","3×10/lado",7]]},
-      {name:"Core · Bloco 2", rest:"30s", items:[["V-Up","3×15",8],["Superman","3×12",7]]},
-      {name:"Core · Bloco 3", rest:"30s", short:false, items:[["hanging_knee","3×10",7],["Russian Twist","3×20",7]]},
-      wodBlock(FIN, "emom", {min:6}, [["Hollow Hold","30s",8],["Bicicleta (Abdominal)","20 reps",7]], {min:4}),
-      {name:AL, rest:"respira fundo", items:[["Postura da Criança","1×40s",1],["Alongamento Flexores da Anca","1×30s/lado",1],["Rotação Torácica (Chão)","1×8/lado",1]]}
-    ]},
-    {blocks:[
-      {name:AQ, rest:"seguido", items:[["cardio_warm","3 min",2],["Dead Bug (Chão)","1×8/lado",2],["Ponte Glúteos (c/ Elástico nos joelhos)","1×12",2]]},
-      {name:"Core · Bloco 1", rest:"30s", items:[["renegade","3×10",7],["Prancha Lateral (Cada lado)","3×30s/lado",7]]},
-      {name:"Core · Bloco 2", rest:"30s", items:[["pallof","3×12/lado",8],["Sit-Up","3×20",8]]},
-      {name:"Core · Bloco 3", rest:"30s", short:false, items:[["farmer","3×40s",7],["Hollow Hold","3×30s",8]]},
-      wodBlock(FIN, "circuit", {work:40, rest:20, rounds:3}, [["Prancha (Frontal)","40s",8],["Bicicleta (Abdominal)","40s",8],["Prancha c/ Toque Ombro","40s",8],["Mountain Climbers","40s",8]], {rounds:2}),
-      {name:AL, rest:"respira fundo", items:[["Postura da Criança","1×40s",1],["Rotação Torácica (Chão)","1×8/lado",1],["Alongamento Glúteo (Figura 4)","1×30s/lado",1]]}
-    ]}
-  ]},
-  wod: {name:"HIIT / WOD", focus:"AMRAP, EMOM ou For Time, contra o relógio", kind:"wod", versions:[
-    {blocks:[
-      {name:AQ, rest:"seguido", items:[["cardio_warm","3 min",2],["Agachamento (Peso Corporal)","1×12",2],["Flexões em Incline","1×8",2]]},
-      wodBlock("WOD · AMRAP", "amrap", {min:20}, [["Burpees","8 reps",9],["kb_swing","12 reps",8],["box_jump","10 reps",8],["Sit-Up","15 reps",7]], {min:12}),
-      {name:AL, rest:"respira fundo", items:[["st_hams","1×40s/lado",1],["Alongamento Flexores da Anca","1×40s/lado",1],["st_chest","1×30s/lado",1]]}
-    ]},
-    {blocks:[
-      {name:AQ, rest:"seguido", items:[["cardio_warm2","3 min",2],["Polichinelos","1×20",2],["Agachamento (Peso Corporal)","1×12",2]]},
-      wodBlock("WOD · EMOM", "emom", {min:20}, [["thruster","10 reps",9],["Mountain Climbers","30 reps",8],["Afundo com Salto","12 reps",8],["Flexões (Padrão)","10 reps",8]], {min:14}),
-      {name:AL, rest:"respira fundo", items:[["Alongamento Quadricípite (De Pé)","1×30s/lado",1],["st_chest","1×40s/lado",1],["Postura da Criança","1×40s",1]]}
-    ]},
-    {blocks:[
-      {name:AQ, rest:"seguido", items:[["cardio_warm","3 min",2],["Alongamento do Mundo (World's Greatest)","1×5/lado",1],["Jump Squats","1×8",3]]},
-      wodBlock("WOD · For Time", "fortime", {cap:18, rounds:5}, [["wall_ball","15 reps",9],["Burpees","10 reps",9],["Skaters","20 reps",8],["V-Up","10 reps",8]], {cap:12, rounds:4}),
-      {name:AL, rest:"respira fundo", items:[["Pigeon","1×40s/lado",1],["st_hams","1×40s/lado",1],["Alongamento Tríceps e Ombro","1×30s/lado",1]]}
-    ]}
-  ]},
-  circuit: {name:"Circuito metabólico", focus:"6 estações · 40s trabalho / 20s descanso", kind:"wod", versions:[
-    {blocks:[
-      {name:AQ, rest:"seguido", items:[["cardio_warm","3 min",2],["Agachamento (Peso Corporal)","1×12",2],["Pull Apart (c/ Elástico)","1×15",2]]},
-      wodBlock("Circuito", "circuit", {work:40, rest:20, rounds:5}, [["goblet","40s",8],["Flexões (Padrão)","40s",8],["kb_swing","40s",8],["row_db","40s",8],["Mountain Climbers","40s",8],["Prancha (Frontal)","40s",7]], {rounds:4}),
-      {name:AL, rest:"respira fundo", items:[["st_hams","1×40s/lado",1],["st_chest","1×40s/lado",1],["Alongamento Flexores da Anca","1×30s/lado",1]]}
-    ]},
-    {blocks:[
-      {name:AQ, rest:"seguido", items:[["cardio_warm2","3 min",2],["Polichinelos","1×20",2],["Cat-Camel (Chão)","1×8",1]]},
-      wodBlock("Circuito", "circuit", {work:40, rest:20, rounds:5}, [["lunge","40s",8],["ohp2","40s",8],["Burpees","40s",9],["pulldown","40s",8],["Skaters","40s",8],["Hollow Hold","40s",7]], {rounds:4}),
-      {name:AL, rest:"respira fundo", items:[["Alongamento Quadricípite (De Pé)","1×30s/lado",1],["st_lats","1×40s",1],["Postura da Criança","1×40s",1]]}
-    ]},
-    {blocks:[
-      {name:AQ, rest:"seguido", items:[["cardio_warm","3 min",2],["Ponte Glúteos (c/ Elástico nos joelhos)","1×12",2],["Flexões em Incline","1×8",2]]},
-      wodBlock("Circuito", "circuit", {work:40, rest:20, rounds:5}, [["hip_thrust_db","40s",8],["thruster","40s",8],["Jump Squats","40s",8],["row_cable","40s",8],["Joelhos ao Peito","40s",8],["Prancha Lateral (Cada lado)","40s",7]], {rounds:4}),
-      {name:AL, rest:"respira fundo", items:[["Alongamento Glúteo (Figura 4)","1×40s/lado",1],["st_chest","1×40s/lado",1],["Alongamento Gémeos (Parede)","1×30s/lado",1]]}
-    ]}
-  ]},
-  cardio: {name:"Cardio", focus:"Máquina ou no lugar, com intervalos", kind:"cardio", versions:[
-    {blocks:[
-      {name:AQ, rest:"seguido", items:[["cardio_warm","5 min",3]]},
-      {name:"Cardio · Intervalos 30/30", rest:"seguido", items:[["cardio_int","10 min",8],["cardio_steady","5 min",5]], short:{items:[["cardio_int","10 min",8]]}},
-      {name:"Cardio · Segunda máquina", rest:"seguido", short:false, items:[["cardio_int2","8 min",8]]},
-      {name:"Cardio · Arrefecer", rest:"seguido", items:[["cardio_cool","3 min",2]]},
-      {name:AL, rest:"respira fundo", items:[["Alongamento Quadricípite (De Pé)","1×30s/lado",1],["Alongamento Gémeos (Parede)","1×30s/lado",1],["st_hams","1×30s/lado",1]]}
-    ]},
-    {blocks:[
-      {name:AQ, rest:"seguido", items:[["cardio_warm2","5 min",3]]},
-      {name:"Cardio · Pirâmide", rest:"seguido", items:[["cardio_int2","12 min",8]], short:{items:[["cardio_int2","8 min",8]]}},
-      {name:"Cardio · Contínuo", rest:"seguido", short:false, items:[["cardio_steady2","10 min",6]]},
-      {name:"Cardio · Arrefecer", rest:"seguido", items:[["cardio_cool","3 min",2]]},
-      {name:AL, rest:"respira fundo", items:[["Alongamento Flexores da Anca","1×30s/lado",1],["st_hams","1×30s/lado",1],["Alongamento Gémeos (Parede)","1×30s/lado",1]]}
-    ]},
-    {blocks:[
-      {name:AQ, rest:"seguido", items:[["cardio_warm","5 min",3]]},
-      {name:"Cardio · Contínuo", rest:"seguido", items:[["cardio_steady","20 min",6]], short:{items:[["cardio_steady","12 min",6]]}},
-      {name:"Cardio · Sprint final", rest:"seguido", short:false, items:[["cardio_int3","6 min",9]]},
-      {name:"Cardio · Arrefecer", rest:"seguido", items:[["cardio_ell","4 min",2]]},
-      {name:AL, rest:"respira fundo", items:[["Alongamento Quadricípite (De Pé)","1×30s/lado",1],["Alongamento Gémeos (Parede)","1×30s/lado",1],["Alongamento Glúteo (Figura 4)","1×30s/lado",1]]}
-    ]}
-  ]},
+
+  /* ---------- RÁPIDO ---------- */
   quick: {name:"Rápido · 20 min", focus:"Para dias maus: curto e intenso", kind:"wod", noDuration:true, versions:[
     {blocks:[
       {name:AQ, rest:"seguido", items:[["Polichinelos","1×30",2],["Agachamento (Peso Corporal)","1×10",2],["Flexões em Incline","1×8",2]]},
@@ -1546,7 +1527,8 @@ var TYPES = {
     ]}
   ]}
 };
-var TYPE_ORDER = ["legs","glutes","upper","push","pull","full","core","wod","circuit","cardio","quick"];
+var TYPE_ORDER = ["glutes","fatloss","strength","tone","core"];
+var QUICK_KEY = "quick";
 
 /* ---------- NUTRIÇÃO ---------- */
 var NUTRI = {
@@ -1665,19 +1647,21 @@ function fig(name, extraClass){
 
 /* ---------- state ---------- */
 var KEY = "dfc1";
-var st = {loc:"gym", type:"legs", dur:"long", ver:{}, weights:{}, last:{}, sess:null, log:[], sound:false, keepAwake:true, ssMode:"alt", custom:{}, subs:{}, prot:{}};
+var st = {loc:"gym", type:"glutes", dur:"long", ver:{}, weights:{}, last:{}, sess:null, log:[], sound:false, keepAwake:true, ssMode:"alt", custom:{}, subs:{}, prot:{}, cycle:{}};
 var ui = {tab:"home", filter:null, libLoc:null, search:"", rest:null, viewDone:null, confirmEnd:false, nsec:"rec", nmeal:null, nq:""};
 try {
   var saved = JSON.parse(localStorage.getItem(KEY) || "null");
   if (saved){
     if (LOCS[saved.loc]) st.loc = saved.loc;
     st.custom = saved.custom || {}; st.subs = saved.subs || {}; st.prot = saved.prot || {};
-    if (typeOf(saved.type)) st.type = saved.type;
+    st.cycle = saved.cycle || {};
+    if (typeOf(saved.type)) st.type = saved.type; else st.type = "glutes";
     if (saved.dur === "short" || saved.dur === "long") st.dur = saved.dur;
     st.ver = saved.ver || {}; st.weights = saved.weights || {}; st.last = saved.last || {}; st.sess = saved.sess || null; st.log = saved.log || [];
     st.sound = saved.sound === true; st.keepAwake = saved.keepAwake !== false; st.ssMode = saved.ssMode || "alt";
   }
 } catch(e){}
+if (st.sess && !typeOf(st.sess.type)) st.sess = null;
 function save(){
   st.updatedAt = Date.now();
   try { localStorage.setItem(KEY, JSON.stringify(st)); } catch(e){}
@@ -1819,14 +1803,16 @@ function resolveDay(typeKey, ver, loc, dur, subs){
       if (b.short.items) nb.items = b.short.items;
       if (b.short.wod) nb.wod = Object.assign({}, b.short.wod);
     }
+    if (short && /Supersérie|Core · Bloco/.test(nb.name)) nb.items = nb.items.map(function(it){ var m = /^(\d+)×(.+)$/.exec(it[1]); if (m && +m[1] >= 4) return [it[0], (+m[1] - 1) + "×" + m[2], it[2]].concat(it.slice(3)); return it; });
+    if (short && nb.name === AQ && nb.items.length > 2) nb.items = nb.items.slice(0, 2);
     nb.pats = nb.items.map(function(it){ return it[0]; });
     nb.items = nb.items.map(function(it, ii){ var r = resolveItem(it, loc); if (it.length > 3 && it[3]) r[3] = it[3]; var sb = subs && subs[itemKey(nb, ii)]; if (sb) r = [sb[0], r[1], r[2], sb[3] || ""]; return r; });
     nb.min = blockMinutes(nb);
     blocks.push(nb);
   });
   var min = 0; blocks.forEach(function(b){ min += b.min; });
-  var vl = t.custom ? "meu" : "ABC".charAt(ver % t.versions.length);
-  return {key:typeKey, ver:ver % t.versions.length, verLabel:vl, title:t.name, focus:t.focus, kind:t.kind, min:min, blocks:blocks, loc:loc, dur:dur, noDuration:!!t.noDuration};
+  var vi = ver % t.versions.length, vl = t.custom ? "meu" : (t.versions.length === 5 ? "Etapa " + (vi + 1) : "ABC".charAt(vi));
+  return {key:typeKey, ver:vi, verLabel:vl, stageTitle:t.versions[vi].title || "", nStages:t.versions.length, isProgram:t.versions.length === 5, title:t.name, focus:t.focus, kind:t.kind, min:min, blocks:blocks, loc:loc, dur:dur, noDuration:!!t.noDuration};
 }
 function curVer(typeKey){ return st.ver[typeKey] || 0; }
 function curSubs(){ return st.subs[subKey(st.type, curVer(st.type), st.loc)] || null; }
@@ -1934,6 +1920,8 @@ function weekStats(){
   (st.log || []).forEach(function(l){ var d = new Date(l.date + "T12:00:00").getTime(); if (now - d < 7 * 86400000){ wk++; min += Math.round((l.sec || 0) / 60); } });
   return {week:wk, min:min, total:(st.log || []).length};
 }
+var _unused_ =
+0;
 var ARROW = '<svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true"><path d="M4 11h13M12 5l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 var HERO_BG = '<svg class="bg" viewBox="0 0 360 300" fill="none" aria-hidden="true"><g stroke="#EEF1E8" stroke-width="1.2"><circle cx="230" cy="130" r="110"/><circle cx="230" cy="130" r="84"/><circle cx="230" cy="130" r="58"/><circle cx="230" cy="130" r="32"/><path d="M40 260c60-40 140-30 200 10M10 300c80-50 180-40 250 0"/></g></svg>';
 
@@ -1944,7 +1932,8 @@ function todayLabel(){
 function fmtDate(iso){ return iso.split("-").reverse().slice(0, 2).join("/"); }
 function daysAgo(iso){ var d = new Date(iso + "T12:00:00"), n = Math.round((Date.now() - d.getTime()) / 86400000); return n <= 0 ? "hoje" : (n === 1 ? "ontem" : "há " + n + " dias"); }
 function lastOfType(k){ var l = null; (st.log || []).forEach(function(x){ if (x.type === k) l = x; }); return l; }
-function suggestedType(){
+function suggestedType(){ return null; }
+function _oldSuggested(){
   var best = null, bestAge = -1;
   ["legs","glutes","upper","push","pull","full"].forEach(function(k){
     var l = lastOfType(k), age = l ? (Date.now() - new Date(l.date + "T12:00:00").getTime()) : 1e15;
@@ -1987,15 +1976,16 @@ function renderHome(){
   });
   h += '</div><p class="note">' + esc(LOCS[st.loc].note) + '. O treino adapta-se ao que há neste sítio.</p>';
 
-  var sug = suggestedType();
-  h += '<div class="step-h"><h2>Que treino queres?</h2><span class="eyebrow">Passo 2</span></div>';
-  h += '<div class="tgrid" role="group" aria-label="Tipo de treino">';
+  h += '<div class="step-h"><h2>Escolhe o programa</h2><span class="eyebrow">Passo 2</span></div>';
+  h += '<div class="plist" role="group" aria-label="Programa">';
   TYPE_ORDER.forEach(function(k){
-    var tt = TYPES[k], l = lastOfType(k), d = resolveDay(k, curVer(k), st.loc, st.dur);
-    var isSug = k === sug && (st.log || []).length > 0;
-    h += '<button class="tcard' + (isSug && k !== st.type ? ' sug' : '') + '" data-type="' + k + '" aria-pressed="' + (st.type === k) + '"><span><span class="hd"><span class="nm">' + esc(tt.name) + '</span>' + (isSug ? '<span class="badge">Sugestão</span>' : '') + '</span><div class="fo">' + esc(keyExercises(d)) + '</div></span><span class="mt"><span>' + (l ? esc(daysAgo(l.date)) : 'por estrear') + '</span><span>' + d.min + '′</span></span></button>';
+    var tt = TYPES[k], cv = curVer(k), cyc = (st.cycle[k] || 0) + 1, l = lastOfType(k);
+    var dots = ''; for (var di = 0; di < tt.versions.length; di++) dots += '<i class="' + (di < cv ? 'ok' : (di === cv ? 'cur' : '')) + '"></i>';
+    h += '<button class="pcardp" data-type="' + k + '" aria-pressed="' + (st.type === k) + '"><span class="pl"><span class="nm">' + esc(tt.name) + '</span><span class="fo">' + esc(tt.focus) + '</span></span><span class="pr"><span class="dots">' + dots + '</span><span class="ps">Etapa ' + (cv + 1) + ' de ' + tt.versions.length + (cyc > 1 ? ' · ciclo ' + cyc : '') + '</span>' + (l ? '<span class="pl2">' + esc(daysAgo(l.date)) + '</span>' : '') + '</span></button>';
   });
   h += '</div>';
+  var qd = resolveDay(QUICK_KEY, curVer(QUICK_KEY), st.loc, st.dur);
+  h += '<button class="pquick" data-type="' + QUICK_KEY + '" aria-pressed="' + (st.type === QUICK_KEY) + '"><span><b>Rápido · 20 min</b><span>Para dias maus: curto e intenso, fora do programa</span></span><span class="mono">' + qd.min + '′</span></button>';
   var cids = Object.keys(st.custom || {});
   if (cids.length) h += '<div class="step-h"><h2>Os teus treinos</h2><span class="eyebrow">criados por ti</span></div>';
   h += '<div class="tgrid">';
@@ -2008,14 +1998,15 @@ function renderHome(){
 
   var inProg = st.sess && !st.sess.finished;
   h += '<div class="hero">' + HERO_BG;
-  h += '<div><div class="eyebrow" style="color:var(--mint)">' + esc(LOCS[st.loc].name) + '</div>';
-  h += '<div class="disp t" style="margin-top:6px">' + esc(day.title) + '</div>';
+  h += '<div><div class="eyebrow" style="color:var(--mint)">' + esc(LOCS[st.loc].name) + (day.isProgram ? ' · ' + esc(day.verLabel) + ' de ' + day.nStages : '') + '</div>';
+  h += '<div class="disp t" style="margin-top:6px">' + esc(day.isProgram ? day.stageTitle : day.title) + '</div>';
+  if (day.isProgram) h += '<div class="meta" style="margin-top:4px;color:var(--mint)">' + esc(day.title) + '</div>';
   h += '<div class="meta">' + day.min + ' min · ' + countItems(day) + ' exercícios · esforço até ' + effortMax(day) + '/10</div>' + (t.custom ? '<button class="tech" id="editCustom" style="margin-top:10px;border-color:rgba(255,255,255,.3);color:var(--chalk)">Editar este treino</button>' : '') + '</div>';
   var nver = t.versions.length;
   if (nver > 1){
-    h += '<div class="vers"><span class="eyebrow" style="color:#B8B4BE;font-size:10px">Versão</span><div class="dur" role="group" aria-label="Versão do treino">';
-    for (var vi = 0; vi < nver; vi++){ var vd = resolveDay(st.type, vi, st.loc, st.dur); h += '<button data-ver="' + vi + '" aria-pressed="' + (curVer(st.type) === vi) + '">' + "ABC".charAt(vi) + '<span>' + esc(keyExercises(vd).split(" · ")[0]) + '</span></button>'; }
-    h += '</div><div class="vnote">' + nver + ' versões diferentes deste tipo. Muda sozinha de cada vez que terminas um treino, ou escolhe tu.</div></div>';
+    h += '<div class="vers"><span class="eyebrow" style="color:#B8B4BE;font-size:10px">' + (day.isProgram ? 'Etapas' : 'Versão') + '</span><div class="dur stg" role="group" aria-label="Etapa">';
+    for (var vi = 0; vi < nver; vi++){ var cvv = curVer(st.type); h += '<button data-ver="' + vi + '" aria-pressed="' + (cvv === vi) + '"' + (vi < cvv ? ' class="done"' : '') + '>' + (day.isProgram ? (vi < cvv ? '✓' : (vi + 1)) : "ABC".charAt(vi)) + '</button>'; }
+    h += '</div><div class="vnote">' + (day.isProgram ? esc(t.goal || "") + ' Fazes as etapas por ordem; quando acabas a 5, recomeças com mais carga.' : nver + ' versões diferentes.') + '</div></div>';
   }
   if (!day.noDuration){
     var dl = resolveDay(st.type, curVer(st.type), st.loc, "long"), ds = resolveDay(st.type, curVer(st.type), st.loc, "short");
@@ -2070,8 +2061,8 @@ function renderProfile(){
   });
   h += '</div>';
   h += '<div class="sec-h"><h2>Como funciona</h2></div>';
-  h += '<div class="rules"><div class="r"><span class="eyebrow">Treinos</span><span>' + nTypes + ' tipos × 3 versões = <b>' + nWork + ' treinos diferentes</b>, cada um adaptado ao local. Mais os que criares em "Criar um treino meu".</span></div>';
-  h += '<div class="r"><span class="eyebrow">Versões</span><span>A versão muda sozinha de cada vez que terminas um treino desse tipo (A → B → C → A). Podes escolher à mão no cartão do treino.</span></div>';
+  h += '<div class="rules"><div class="r"><span class="eyebrow">Treinos</span><span>' + nTypes + ' programas × 5 etapas = <b>' + nWork + ' treinos diferentes</b>, cada um adaptado ao local. Mais o Rápido 20′ e os que criares.</span></div>';
+  h += '<div class="r"><span class="eyebrow">Etapas</span><span>Escolhes um programa e fazes as 5 etapas por ordem. A app avança sozinha quando terminas cada uma. No fim da 5 recomeça (ciclo 2, 3…) e os pesos vão subindo. Podes trocar de programa quando quiseres; cada um guarda onde ficaste.</span></div>';
   h += '<div class="r"><span class="eyebrow">Superséries</span><span>A1 → 30s → A2 → 75s → repete. A app troca sozinha entre os dois.</span></div>';
   h += '<div class="r"><span class="eyebrow">Progressão</span><span>Séries todas feitas com esforço igual ou abaixo do indicado → <b>+2,5 kg</b> na barra e máquinas, <b>+1 kg</b> nos halteres. O peso é editável série a série e fica guardado.</span></div>';
   h += '<div class="r"><span class="eyebrow">Esforço</span><span>1 quase nada · 5 sobra muito · 8 sobram 2 reps · 9 sobra 1 · 10 falha</span></div></div>';
@@ -2617,7 +2608,7 @@ function renderWorkout(){
 
   var h = '<div class="wrap">';
   h += '<div class="wk-h"><button class="ib" id="wkBack" aria-label="Voltar aos treinos"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M12.5 4L6.5 10l6 6" stroke="#EEF1E8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>';
-  h += '<div style="flex-grow:1;min-width:0"><div class="eyebrow" style="font-size:10px;color:var(--nmuted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(LOCS[s.loc].name) + ' · ' + day.verLabel + ' · ' + doneSets + '/' + totalSets + ' séries</div><div style="font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(day.title) + '</div></div>';
+  h += '<div style="flex-grow:1;min-width:0"><div class="eyebrow" style="font-size:10px;color:var(--nmuted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(LOCS[s.loc].name) + ' · ' + esc(day.verLabel) + ' · ' + doneSets + '/' + totalSets + ' séries</div><div style="font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(day.title) + '</div></div>';
   h += '<button class="clock' + (s.running || s.finished ? "" : " paused") + '" id="clockBtn" aria-label="' + (s.running ? "Pausar sessão" : "Continuar sessão") + '"><b class="tnum" id="clockTxt">' + mmss(el_s) + '</b><span>' + (s.running || s.finished ? "de " + mmss(total) : "em pausa · toca") + '</span></button></div>';
   h += '<div class="tools"><button class="tool' + (st.sound === true ? ' on' : '') + '" id="soundBtn" aria-pressed="' + (st.sound === true) + '"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 6h2.5l3.5-3v10l-3.5-3H2.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>' + (st.sound !== true ? '<path d="M11 6l3.5 4M14.5 6L11 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>' : '<path d="M11 5.5c1 .8 1.5 1.6 1.5 2.5s-.5 1.7-1.5 2.5M12.8 3.8c1.5 1.1 2.2 2.5 2.2 4.2s-.7 3.1-2.2 4.2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>') + '</svg><span>' + (st.sound === true ? 'Som: ligado' : 'Som: desligado') + '</span></button><button class="tool" id="wakeBtn" aria-pressed="false"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="4" y="1.5" width="8" height="13" rx="1.8" stroke="currentColor" stroke-width="1.5"/><path d="M7 12.2h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span>Ecrã</span></button>';
   h += '<button class="tool" id="locBtn"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 14s4.5-4 4.5-7.5a4.5 4.5 0 0 0-9 0C3.5 10 8 14 8 14z" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="6.5" r="1.5" stroke="currentColor" stroke-width="1.5"/></svg><span>' + esc(LOCS[s.loc].name) + ' · trocar</span></button></div>';
@@ -2649,7 +2640,9 @@ function renderWorkout(){
     el.innerHTML = h;
     document.getElementById("finishBtn").addEventListener("click", function(){
       logSession();
-      st.ver[st.sess.type] = (st.sess.ver + 1) % typeOf(st.sess.type).versions.length;
+      var nv = typeOf(st.sess.type).versions.length, nx = (st.sess.ver + 1) % nv;
+      if (nx === 0 && nv === 5) st.cycle[st.sess.type] = (st.cycle[st.sess.type] || 0) + 1;
+      st.ver[st.sess.type] = nx;
       st.sess = null; ui.rest = null; save(); showWorkout(false);
     });
     var fr = document.getElementById("finishRepeat");
@@ -2843,7 +2836,7 @@ function logSession(){
     if (!isWod(b)) return; var w = s.wod && s.wod[bi]; if (!w || !(w.finished || w.accum > 0)) return;
     wods.push({name:b.name + " · " + wodTitle(b), kind:wodLabel(b), rounds:(b.wod.kind === "amrap" || b.wod.kind === "fortime") ? w.rounds : null, sec:Math.round((w.sec != null ? w.sec : w.accum / 1000))});
   });
-  var entry = {date:new Date().toISOString().slice(0,10), type:s.type, ver:day.verLabel, loc:s.loc, dur:s.dur, title:day.title, done:Object.keys(s.done).length, total:total, sec:Math.round(s.endSec || 0), partial:!!s.partial, ex:ex, wod:wods};
+  var entry = {date:new Date().toISOString().slice(0,10), type:s.type, ver:day.verLabel, loc:s.loc, dur:s.dur, title:day.isProgram ? day.title + ' · ' + day.stageTitle : day.title, done:Object.keys(s.done).length, total:total, sec:Math.round(s.endSec || 0), partial:!!s.partial, ex:ex, wod:wods};
   (st.log = st.log || []).push(entry);
   if (st.log.length > 200) st.log = st.log.slice(-200);
 }
