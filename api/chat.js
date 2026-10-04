@@ -61,7 +61,7 @@ const TOOL = {
 
 const REPO = process.env.GITHUB_REPO || "tcostafoto-bit/diana-fit-coach";
 async function createIssue(text) {
-  const tok = process.env.GITHUB_TOKEN; if (!tok) return null;
+  const tok = process.env.GITHUB_TOKEN; if (!tok) return { err: "sem token" };
   try {
     const title = "Pedido da Diana: " + clip(String(text).split("\n")[0], 80);
     const r = await fetch("https://api.github.com/repos/" + REPO + "/issues", {
@@ -69,9 +69,9 @@ async function createIssue(text) {
       headers: { "Authorization": "Bearer " + tok, "Accept": "application/vnd.github+json", "Content-Type": "application/json", "User-Agent": "diana-fit-coach" },
       body: JSON.stringify({ title, body: clip(text, 6000) + "\n\n---\nPedido feito pela Diana no Coach da app.", labels: ["pedido-diana"] })
     });
-    if (!r.ok) return null;
+    if (!r.ok) return { err: "erro " + r.status };
     return await r.json();
-  } catch (e) { return null; }
+  } catch (e) { return { err: "sem ligação" }; }
 }
 
 function clip(s, n) { s = String(s == null ? "" : s); return s.length > n ? s.slice(0, n) : s; }
@@ -119,7 +119,7 @@ module.exports = async function handler(req, res) {
     for (const a of actions) {
       if (a && a.tipo === "request_tiago" && a.texto) {
         const issue = await createIssue(a.texto);
-        if (issue) { a.issue = issue.number; a.url = issue.html_url; }
+        if (issue && issue.number) { a.issue = issue.number; a.url = issue.html_url; } else if (issue) a.fila = issue.err;
       }
     }
     res.status(200).json({ reply: clip(out.resposta, 4000), actions });

@@ -2183,7 +2183,7 @@ function actionCard(a, mi, ai){
   else if (a.tipo === "set_program"){ var tt = TYPES[a.programa]; t = "Mudar programa"; d = (tt ? tt.name : a.programa) + " · etapa " + a.etapa; }
   else if (a.tipo === "request_tiago"){ t = a.issue ? "Pedido de mudança na app · #" + a.issue : "Pedido para o Tiago"; d = a.texto || ""; }
   else return "";
-  return '<div class="actc"><div><b>' + esc(t) + '</b><span>' + esc(d) + '</span></div>' + (a.tipo === "request_tiago" ? '<em>' + (a.issue ? 'na fila' : 'anotado') + '</em>' : (done ? '<em>aplicado</em>' : '<button class="tech" data-act="' + mi + '.' + ai + '">Aplicar</button>')) + '</div>';
+  return '<div class="actc"><div><b>' + esc(t) + '</b><span>' + esc(d) + '</span></div>' + (a.tipo === "request_tiago" ? '<em>' + (a.issue ? 'na fila' : (a.fila ? 'fila: ' + esc(a.fila) : 'anotado')) + '</em>' : (done ? '<em>aplicado</em>' : '<button class="tech" data-act="' + mi + '.' + ai + '">Aplicar</button>')) + '</div>';
 }
 function findEx(n){
   if (!n) return null; if (EX[n]) return n;
