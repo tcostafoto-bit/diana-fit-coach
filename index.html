@@ -144,7 +144,7 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(-
 
 /* tab bar */
 .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:10;background:rgba(243,240,234,.96);border-top:1px solid var(--line);padding:6px 16px calc(6px + env(safe-area-inset-bottom,0px));backdrop-filter:blur(8px)}
-.tabbar .in{max-width:480px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:4px}
+.tabbar .in{max-width:480px;margin:0 auto;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px}
 .tabbar button{min-height:52px;border:none;background:none;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11.5px;font-weight:600;color:var(--muted);padding:0 2px}
 .tabbar button[aria-current="page"]{color:var(--ink);background:var(--paper2)}
 
@@ -298,6 +298,28 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(-
 .rounds .step{width:52px;height:52px;font-size:26px;border-radius:14px}
 .wod-note{margin:0;font-size:13px;line-height:1.45;color:var(--nsoft)}
 
+/* coach */
+.chatwrap{padding-bottom:calc(180px + env(safe-area-inset-bottom,0px))}
+.msgs{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+.msg{max-width:86%;padding:10px 14px;border-radius:16px;font-size:14.5px;line-height:1.5}
+.msg p{margin:0 0 6px}.msg p:last-child{margin:0}
+.msg.ai{align-self:flex-start;background:var(--surface);border:1px solid var(--line);border-bottom-left-radius:6px}
+.msg.me{align-self:flex-end;background:var(--green-deep);color:var(--chalk);border-bottom-right-radius:6px}
+.msg.typing{color:var(--muted);font-style:italic}
+.sugs{display:flex;flex-wrap:wrap;gap:6px}
+.chip.sug{font-family:var(--sans);font-size:12.5px;color:var(--ink);text-align:left;min-height:38px}
+.actc{align-self:flex-start;max-width:92%;display:flex;gap:10px;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:14px;border:1.5px solid var(--mint);background:var(--surface)}
+.actc b{display:block;font-size:13.5px}
+.actc span{display:block;font-size:12px;color:var(--muted);margin-top:2px;line-height:1.35}
+.actc em{font-style:normal;font-family:var(--mono);font-size:11px;color:var(--green);white-space:nowrap}
+.actc .tech{color:var(--ink);border-color:var(--ink);flex-shrink:0}
+.chatbar{position:fixed;left:0;right:0;bottom:calc(68px + env(safe-area-inset-bottom,0px));z-index:9;padding:8px 16px;background:linear-gradient(rgba(243,240,234,0),var(--paper) 30%)}
+.chatbar .in{max-width:480px;margin:0 auto;display:flex;gap:8px;align-items:flex-end;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:6px 6px 6px 14px;box-shadow:0 8px 24px rgba(27,26,31,.10)}
+.chatbar textarea{flex-grow:1;border:none;background:transparent;resize:none;font-family:var(--sans);font-size:16px;line-height:1.4;padding:8px 0;color:var(--ink);outline:none;max-height:140px}
+.chatbar button{width:44px;height:44px;border-radius:13px;border:none;background:var(--green-deep);color:var(--mint);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.chatbar button:disabled{opacity:.5}
+.chatcode{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+
 /* programas */
 .plist{display:flex;flex-direction:column;gap:8px}
 .pcardp{width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;text-align:left;border:1px solid var(--line);border-radius:18px;background:var(--surface);padding:14px 14px;min-height:78px;font-family:inherit;color:var(--ink)}
@@ -336,7 +358,11 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(-
 .padd button{min-height:36px;padding:0 12px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:var(--chalk);font-family:var(--mono);font-size:12px;font-weight:600}
 .padd button.rs{border-style:dashed;color:#CFCCD6}
 .rcard{width:100%;display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:12px;align-items:center;text-align:left;border:1px solid var(--line);border-radius:16px;background:var(--surface);padding:10px 12px;min-height:76px;font-family:inherit;color:var(--ink);margin-top:8px}
-.rcard .ic{width:56px;height:56px;border-radius:14px;background:var(--paper2);display:flex;align-items:center;justify-content:center;color:var(--green)}
+.rcard{grid-template-columns:72px minmax(0,1fr) auto}
+.rcard .ic{width:72px;height:72px;border-radius:14px;background:var(--paper2);display:flex;align-items:center;justify-content:center;color:var(--green);position:relative;overflow:hidden}
+.rcard .ic img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.rphoto{margin-top:12px;border-radius:18px;overflow:hidden;aspect-ratio:16/10;background:var(--paper2)}
+.rphoto img{width:100%;height:100%;object-fit:cover;display:block}
 .rcard .nm{font-size:15px;font-weight:700;line-height:1.25}
 .rcard .mu{font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-top:4px}
 .rcard .kc{text-align:right;font-family:var(--mono);font-size:11px;color:var(--muted);line-height:1.4;white-space:nowrap}
@@ -422,6 +448,7 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(-
 <div class="light" id="lib" hidden></div>
 <div class="light" id="nutri" hidden></div>
 <div class="light" id="profile" hidden></div>
+<div class="light" id="chat" hidden></div>
 <nav class="tabbar" id="tabbar" aria-label="Secções">
   <div class="in">
     <button id="tabHome" aria-current="page">
@@ -435,6 +462,10 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(-
     <button id="tabNutri">
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 17c-3.5 0-6-2.5-6-6 0-2.5 1.5-4.5 3.5-5 1 0 1.8.3 2.5.8.7-.5 1.5-.8 2.5-.8 2 .5 3.5 2.5 3.5 5 0 3.5-2.5 6-6 6z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M10 6.5c0-2 1-3.5 3-3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
       Nutrição
+    </button>
+    <button id="tabChat">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M3.5 4.5h13v9h-7l-4 3v-3h-2z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+      Coach
     </button>
     <button id="tabProfile">
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="7" r="3.5" stroke="currentColor" stroke-width="1.6"/><path d="M3.5 17c1-3.5 3.5-5 6.5-5s5.5 1.5 6.5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -1376,6 +1407,40 @@ var TYPES = {
       al(S_LEG2)])
   ]},
 
+  /* ---------- SÓ GLÚTEO ---------- */
+  gluteonly: {name:"Só glúteo", focus:"100% glúteo, mais nada: cada etapa ataca uma parte", goal:"Cada etapa tem um foco: glúteo máximo, médio, a ligação com os posteriores, unilateral e pump final.", kind:"strength", versions:[
+    stage("Glúteo máximo · Hip thrust", [aq(W_LEG),
+      ss(A, REST_A, [["hip_thrust","5×8",9],["Ponte Glúteos (c/ Elástico nos joelhos)","4×20",8]]),
+      ss(B, REST_B, [["hip_thrust_db","4×12",8],["kickback","3×15/lado",8]]),
+      ss(C, REST_C, [["Ponte Glúteos Unilateral","3×12/lado",8],["glute_med","3×20",8]], "long"),
+      fin("amrap", {min:8}, [["Ponte Glúteos (c/ Elástico nos joelhos)","20 reps",8],["kb_swing","15 reps",8],["Monster Walk (c/ Elástico nos joelhos)","12 passos",8]], {min:5}),
+      al(S_LEG)]),
+    stage("Glúteo médio · Lateral da anca", [aq(W_LEG2),
+      ss(A, REST_A, [["glute_med","4×15",9],["Monster Walk (c/ Elástico nos joelhos)","4×15 passos",8]]),
+      ss(B, REST_B, [["glute_med2","4×15/lado",8],["Clamshell c/ Mini Band","3×20/lado",8]]),
+      ss(C, REST_C, [["Abdução de Anca Deitada","3×20/lado",8],["Agachamento Sumo c/ Elástico","3×15",8]], "long"),
+      fin("emom", {min:8}, [["Monster Walk (c/ Elástico nos joelhos)","15 passos",8],["Clamshell c/ Mini Band","15/lado",8]], {min:6}),
+      al(S_LEG2)]),
+    stage("Glúteo e posteriores · Hinge", [aq(W_LEG),
+      ss(A, REST_A, [["rdl","4×10",9],["pull_through","4×15",8]]),
+      ss(B, REST_B, [["sumo_dl","4×8",8],["kb_swing","4×15",8]]),
+      ss(C, REST_C, [["RDL Unilateral (Peso Corporal)","3×10/lado",8],["Hamstring Walkout","3×10",8]], "long"),
+      fin("amrap", {min:8}, [["kb_swing","15 reps",8],["Ponte Glúteos Unilateral","10/lado",8]], {min:5}),
+      al(S_LEG)]),
+    stage("Glúteo unilateral · Uma perna", [aq(W_LEG2),
+      ss(A, REST_A, [["bulgarian","4×10/lado",9],["Ponte Glúteos Unilateral","4×12/lado",8]]),
+      ss(B, REST_B, [["stepup","4×10/lado",8],["kickback","3×15/lado",8]]),
+      ss(C, REST_C, [["lunge","3×12/lado",8],["glute_med2","3×15/lado",8]], "long"),
+      fin("emom", {min:8}, [["Afundo com Salto","12 reps",8],["Ponte Glúteos Unilateral","10/lado",8]], {min:6}),
+      al(S_LEG2)]),
+    stage("Pump final · Queimar o glúteo", [aq(W_LEG),
+      ss(A, FL_A, [["hip_thrust","4×15",9],["glute_med","4×20",8]]),
+      ss(B, FL_B, [["kickback","4×15/lado",8],["Kickback de Glúteo c/ Mini Band","3×20/lado",8]]),
+      ss(C, FL_C, [["Ponte Glúteos (c/ Elástico nos joelhos)","3×25",8],["Clamshell c/ Mini Band","3×20/lado",8]], "long"),
+      fin("circuit", {work:40, rest:20, rounds:3}, [["Ponte Glúteos (c/ Elástico nos joelhos)","40s",8],["Monster Walk (c/ Elástico nos joelhos)","40s",8],["Kickback de Glúteo c/ Mini Band","40s",8],["Agachamento Sumo c/ Elástico","40s",8]], {rounds:2}),
+      al(S_LEG)])
+  ]},
+
   /* ---------- PERDA DE PESO ---------- */
   fatloss: {name:"Perda de peso", focus:"Queimar mais, perder gordura sem perder músculo", goal:"Corpo inteiro com descansos curtos, superséries rápidas, finishers longos e 1 etapa de cardio intervalado.", kind:"strength", versions:[
     stage("Corpo inteiro · superséries", [aq(W_FULL),
@@ -1527,7 +1592,7 @@ var TYPES = {
     ]}
   ]}
 };
-var TYPE_ORDER = ["glutes","fatloss","strength","tone","core"];
+var TYPE_ORDER = ["gluteonly","glutes","fatloss","strength","tone","core"];
 var QUICK_KEY = "quick";
 
 /* ---------- NUTRIÇÃO ---------- */
@@ -1586,22 +1651,22 @@ var NUTRI = {
   supNote: "Se estiveres grávida, a amamentar, a tomar medicação ou tiveres alguma condição de saúde, valida com a médica antes de começar qualquer suplemento. Compra marcas com testes de terceiros (Informed Sport, NSF, Cologne List).",
   meals: [["pa","Pequeno-almoço"],["al","Almoço"],["ja","Jantar"],["sn","Snack"],["pos","Pós-treino"],["doce","Doce saudável"]],
   recipes: [
-    {n:"Papas de aveia proteicas", m:"pa", min:8, kcal:380, prot:30, ing:["50 g de aveia","200 ml de leite ou bebida vegetal","1 scoop de whey (30 g) ou 150 g de iogurte grego","1 banana ou punhado de frutos vermelhos","canela"], st:["Cozinha a aveia com o leite em lume brando 4 a 5 minutos, a mexer.","Tira do lume, deixa arrefecer 1 minuto e mistura a whey (se puseres com o lume ligado fica grumosa).","Cobre com fruta e canela."], tip:"Faz de véspera com iogurte em vez de cozinhar: aveia + iogurte + leite no frigorífico (overnight oats)."},
-    {n:"Ovos mexidos com espinafres e pão", m:"pa", min:8, kcal:360, prot:26, ing:["2 ovos + 2 claras","mão cheia de espinafres","1 fatia de pão integral ou de centeio","1 c. chá de azeite","sal, pimenta"], st:["Salteia os espinafres no azeite 1 minuto.","Junta os ovos batidos, lume brando, mexe devagar até cremosos.","Serve sobre o pão torrado."], tip:"Junta 30 g de queijo fresco ou 1/4 de abacate se precisares de mais gordura boa."},
-    {n:"Iogurte grego, granola e fruta", m:"pa", min:3, kcal:320, prot:24, ing:["200 g de iogurte grego magro ou skyr","30 g de granola pouco açucarada","fruta à escolha","1 c. chá de sementes de chia"], st:["Põe tudo numa taça, por camadas.","Se o iogurte for muito ácido, 1 c. chá de mel."], tip:"É também um bom pós-treino."},
-    {n:"Panquecas de banana e aveia", m:"pa", min:12, kcal:340, prot:22, ing:["1 banana madura","2 ovos","40 g de aveia","1 c. chá de fermento","canela","óleo de coco ou spray para untar"], st:["Tritura tudo (ou esmaga a banana e mistura à mão).","Frigideira antiaderente em lume médio, colheradas pequenas, 2 minutos por lado.","Serve com iogurte e fruta."], tip:"Faz o dobro e guarda no frigorífico; aquecem em 30 segundos."},
-    {n:"Bowl de arroz, frango e legumes", m:"al", min:20, kcal:480, prot:40, ing:["130 g de peito de frango","70 g de arroz (peso cru) ou 150 g cozido","brócolos, courgette, pimento","1 c. sopa de azeite","alho, paprica, limão"], st:["Corta o frango em tiras, tempera com paprica, alho e sal.","Grelha em frigideira quente 6 a 8 minutos.","Salteia os legumes 4 minutos. Monta com o arroz e rega com limão."], tip:"Cozinha 3 doses ao domingo. Aguenta 3 dias no frigorífico."},
-    {n:"Salada de atum, grão e ovo", m:"al", min:10, kcal:430, prot:38, ing:["1 lata de atum ao natural","150 g de grão cozido","1 ovo cozido","tomate, pepino, cebola roxa, rúcula","1 c. sopa de azeite, vinagre, orégãos"], st:["Mistura tudo numa taça grande.","Tempera e serve. Sem cozinhar."], tip:"Troca o atum por salmão de lata ou sardinha para variar."},
-    {n:"Wrap de peru e húmus", m:"al", min:6, kcal:400, prot:30, ing:["1 tortilha integral","100 g de peito de peru fatiado","2 c. sopa de húmus","alface, tomate, cenoura ralada","pimenta"], st:["Barra a tortilha com húmus.","Distribui o peru e os vegetais, enrola apertado.","Corta ao meio."], tip:"Bom para levar para o trabalho; embrulha em papel vegetal."},
-    {n:"Omelete de legumes com salada", m:"al", min:10, kcal:350, prot:26, ing:["3 ovos","cogumelos, pimento, cebola","30 g de queijo ralado (opcional)","salada verde","1 c. chá de azeite"], st:["Salteia os legumes 3 minutos.","Junta os ovos batidos, tapa, lume brando 4 minutos.","Dobra e serve com salada."], tip:"Com uma fatia de pão integral fica uma refeição completa de dia de treino."},
-    {n:"Salmão no forno com batata-doce", m:"ja", min:25, kcal:520, prot:36, ing:["150 g de salmão","200 g de batata-doce","espargos ou feijão-verde","1 c. sopa de azeite","limão, alho, ervas"], st:["Batata-doce em cubos com metade do azeite, forno a 200 °C 15 minutos.","Junta o salmão e os legumes ao tabuleiro, mais 10 a 12 minutos.","Limão por cima e serve."], tip:"Um tabuleiro só, quase sem loiça."},
+    {n:"Papas de aveia proteicas", img:"1686344234276-dc3ac6f284ff", m:"pa", min:8, kcal:380, prot:30, ing:["50 g de aveia","200 ml de leite ou bebida vegetal","1 scoop de whey (30 g) ou 150 g de iogurte grego","1 banana ou punhado de frutos vermelhos","canela"], st:["Cozinha a aveia com o leite em lume brando 4 a 5 minutos, a mexer.","Tira do lume, deixa arrefecer 1 minuto e mistura a whey (se puseres com o lume ligado fica grumosa).","Cobre com fruta e canela."], tip:"Faz de véspera com iogurte em vez de cozinhar: aveia + iogurte + leite no frigorífico (overnight oats)."},
+    {n:"Ovos mexidos com espinafres e pão", img:"1687630433865-f86f07be989a", m:"pa", min:8, kcal:360, prot:26, ing:["2 ovos + 2 claras","mão cheia de espinafres","1 fatia de pão integral ou de centeio","1 c. chá de azeite","sal, pimenta"], st:["Salteia os espinafres no azeite 1 minuto.","Junta os ovos batidos, lume brando, mexe devagar até cremosos.","Serve sobre o pão torrado."], tip:"Junta 30 g de queijo fresco ou 1/4 de abacate se precisares de mais gordura boa."},
+    {n:"Iogurte grego, granola e fruta", img:"1692071106919-01bc0b9b0919", m:"pa", min:3, kcal:320, prot:24, ing:["200 g de iogurte grego magro ou skyr","30 g de granola pouco açucarada","fruta à escolha","1 c. chá de sementes de chia"], st:["Põe tudo numa taça, por camadas.","Se o iogurte for muito ácido, 1 c. chá de mel."], tip:"É também um bom pós-treino."},
+    {n:"Panquecas de banana e aveia", img:"1528207776546-365bb710ee93", m:"pa", min:12, kcal:340, prot:22, ing:["1 banana madura","2 ovos","40 g de aveia","1 c. chá de fermento","canela","óleo de coco ou spray para untar"], st:["Tritura tudo (ou esmaga a banana e mistura à mão).","Frigideira antiaderente em lume médio, colheradas pequenas, 2 minutos por lado.","Serve com iogurte e fruta."], tip:"Faz o dobro e guarda no frigorífico; aquecem em 30 segundos."},
+    {n:"Bowl de arroz, frango e legumes", img:"1679279726946-a158b8bcaa23", m:"al", min:20, kcal:480, prot:40, ing:["130 g de peito de frango","70 g de arroz (peso cru) ou 150 g cozido","brócolos, courgette, pimento","1 c. sopa de azeite","alho, paprica, limão"], st:["Corta o frango em tiras, tempera com paprica, alho e sal.","Grelha em frigideira quente 6 a 8 minutos.","Salteia os legumes 4 minutos. Monta com o arroz e rega com limão."], tip:"Cozinha 3 doses ao domingo. Aguenta 3 dias no frigorífico."},
+    {n:"Salada de atum, grão e ovo", img:"1604909052743-94e838986d24", m:"al", min:10, kcal:430, prot:38, ing:["1 lata de atum ao natural","150 g de grão cozido","1 ovo cozido","tomate, pepino, cebola roxa, rúcula","1 c. sopa de azeite, vinagre, orégãos"], st:["Mistura tudo numa taça grande.","Tempera e serve. Sem cozinhar."], tip:"Troca o atum por salmão de lata ou sardinha para variar."},
+    {n:"Wrap de peru e húmus", img:"1646530208887-8a791bff4701", m:"al", min:6, kcal:400, prot:30, ing:["1 tortilha integral","100 g de peito de peru fatiado","2 c. sopa de húmus","alface, tomate, cenoura ralada","pimenta"], st:["Barra a tortilha com húmus.","Distribui o peru e os vegetais, enrola apertado.","Corta ao meio."], tip:"Bom para levar para o trabalho; embrulha em papel vegetal."},
+    {n:"Omelete de legumes com salada", img:"1677844592730-ce9c936d8f1a", m:"al", min:10, kcal:350, prot:26, ing:["3 ovos","cogumelos, pimento, cebola","30 g de queijo ralado (opcional)","salada verde","1 c. chá de azeite"], st:["Salteia os legumes 3 minutos.","Junta os ovos batidos, tapa, lume brando 4 minutos.","Dobra e serve com salada."], tip:"Com uma fatia de pão integral fica uma refeição completa de dia de treino."},
+    {n:"Salmão no forno com batata-doce", img:"1519708227418-c8fd9a32b7a2", m:"ja", min:25, kcal:520, prot:36, ing:["150 g de salmão","200 g de batata-doce","espargos ou feijão-verde","1 c. sopa de azeite","limão, alho, ervas"], st:["Batata-doce em cubos com metade do azeite, forno a 200 °C 15 minutos.","Junta o salmão e os legumes ao tabuleiro, mais 10 a 12 minutos.","Limão por cima e serve."], tip:"Um tabuleiro só, quase sem loiça."},
     {n:"Peito de peru com puré de couve-flor", m:"ja", min:20, kcal:380, prot:42, ing:["150 g de bife de peru","300 g de couve-flor","1 c. sopa de iogurte grego","alho, noz-moscada","salada ou legumes salteados"], st:["Coze a couve-flor 10 minutos, escorre bem, tritura com iogurte, alho e noz-moscada.","Grelha o peru 3 a 4 minutos por lado.","Serve com o puré e legumes."], tip:"O puré de couve-flor tem 1/4 das calorias do puré de batata e sabe quase igual."},
     {n:"Chili de peru e feijão", m:"ja", min:30, kcal:450, prot:38, ing:["150 g de carne de peru picada","1 lata de feijão vermelho","1 lata de tomate pelado","cebola, alho, pimento","cominhos, paprica, malagueta"], st:["Refoga cebola e alho, junta a carne e sela.","Junta pimento, tomate, especiarias. 15 minutos em lume brando.","Junta o feijão nos últimos 5 minutos."], tip:"Rende 3 doses e congela bem. Serve com arroz nos dias de treino, com salada nos outros."},
     {n:"Sopa de legumes com frango desfiado", m:"ja", min:30, kcal:320, prot:30, ing:["1 peito de frango","cenoura, alho-francês, courgette, abóbora","1 batata pequena","1 c. sopa de azeite","sal, coentros"], st:["Coze o frango e os legumes em água temperada 20 minutos.","Tira o frango, tritura a sopa, desfia o frango e volta a juntar.","Azeite e coentros a servir."], tip:"Jantar leve para dias de descanso ou quando o almoço foi grande."},
     {n:"Massa integral com camarão e courgette", m:"ja", min:15, kcal:470, prot:32, ing:["70 g de massa integral","150 g de camarão","1 courgette em fios ou meias-luas","alho, malagueta, limão","1 c. sopa de azeite"], st:["Coze a massa. Salteia alho e malagueta no azeite, junta o camarão 2 minutos.","Junta a courgette 2 minutos e a massa escorrida.","Raspa de limão e serve."], tip:"Metade massa, metade courgette dá volume com menos calorias."},
     {n:"Batido pós-treino", m:"pos", min:3, kcal:330, prot:32, ing:["1 scoop de whey (30 g)","1 banana","30 g de aveia","250 ml de leite ou água","gelo"], st:["Liquidificadora, 30 segundos."], tip:"Sem whey: 200 g de iogurte grego ou skyr no lugar."},
     {n:"Tosta de atum e requeijão", m:"pos", min:5, kcal:300, prot:30, ing:["2 fatias de pão integral","1/2 lata de atum","2 c. sopa de requeijão ou queijo fresco","tomate, orégãos"], st:["Mistura o atum com o requeijão.","Barra o pão torrado, tomate por cima."], tip:"Pós-treino rápido quando não há tempo para cozinhar."},
-    {n:"Skyr com fruta e frutos secos", m:"sn", min:2, kcal:220, prot:20, ing:["150 g de skyr ou iogurte grego","fruta","10 amêndoas ou nozes"], st:["Mistura e come."], tip:"O snack mais fácil de sempre. Tem no frigorífico do trabalho."},
+    {n:"Skyr com fruta e frutos secos", img:"1610441009633-b6ca9c6d4be2", m:"sn", min:2, kcal:220, prot:20, ing:["150 g de skyr ou iogurte grego","fruta","10 amêndoas ou nozes"], st:["Mistura e come."], tip:"O snack mais fácil de sempre. Tem no frigorífico do trabalho."},
     {n:"Húmus com palitos de legumes", m:"sn", min:5, kcal:180, prot:7, ing:["3 c. sopa de húmus","cenoura, pepino, pimento, aipo em palitos"], st:["Corta e molha."], tip:"Sacia sem pesar. Faz o húmus em casa: grão cozido, tahini, limão, alho, azeite, triturar."},
     {n:"Ovos cozidos e fruta", m:"sn", min:10, kcal:200, prot:14, ing:["2 ovos","1 peça de fruta","sal, pimenta"], st:["Coze os ovos 9 minutos, arrefece em água fria.","Guarda com casca no frigorífico até 5 dias."], tip:"Coze 6 ao domingo."},
     {n:"Gelado de banana", m:"doce", min:5, kcal:150, prot:3, ing:["2 bananas congeladas em rodelas","1 c. sopa de cacau em pó ou manteiga de amendoim","salpico de leite"], st:["Tritura as bananas congeladas até ficar cremoso (raspa as paredes 2 ou 3 vezes).","Junta o cacau ou a manteiga de amendoim."], tip:"Tem bananas cortadas sempre no congelador."},
@@ -1647,14 +1712,14 @@ function fig(name, extraClass){
 
 /* ---------- state ---------- */
 var KEY = "dfc1";
-var st = {loc:"gym", type:"glutes", dur:"long", ver:{}, weights:{}, last:{}, sess:null, log:[], sound:false, keepAwake:true, ssMode:"alt", custom:{}, subs:{}, prot:{}, cycle:{}};
+var st = {loc:"gym", type:"glutes", dur:"long", ver:{}, weights:{}, last:{}, sess:null, log:[], sound:false, keepAwake:true, ssMode:"alt", custom:{}, subs:{}, prot:{}, cycle:{}, chat:[], chatCode:"", requests:[]};
 var ui = {tab:"home", filter:null, libLoc:null, search:"", rest:null, viewDone:null, confirmEnd:false, nsec:"rec", nmeal:null, nq:""};
 try {
   var saved = JSON.parse(localStorage.getItem(KEY) || "null");
   if (saved){
     if (LOCS[saved.loc]) st.loc = saved.loc;
     st.custom = saved.custom || {}; st.subs = saved.subs || {}; st.prot = saved.prot || {};
-    st.cycle = saved.cycle || {};
+    st.cycle = saved.cycle || {}; st.chat = saved.chat || []; st.chatCode = saved.chatCode || ""; st.requests = saved.requests || [];
     if (typeOf(saved.type)) st.type = saved.type; else st.type = "glutes";
     if (saved.dur === "short" || saved.dur === "long") st.dur = saved.dur;
     st.ver = saved.ver || {}; st.weights = saved.weights || {}; st.last = saved.last || {}; st.sess = saved.sess || null; st.log = saved.log || [];
@@ -2045,6 +2110,105 @@ function renderHome(){
 }
 document.getElementById("importFile").addEventListener("change", function(e){ var f = e.target.files && e.target.files[0]; if (f) importData(f); e.target.value = ""; });
 
+/* ---------- COACH (chat) ---------- */
+var CHAT_ICON = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M3.5 4.5h13v9h-7l-4 3v-3h-2z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+var chatBusy = false;
+function chatCtx(){
+  var names = [];
+  LIB.forEach(function(g){ var gl = GROUP_LOC[g.g] || LOC_ORDER; if (gl.indexOf(st.loc) < 0) return; g.items.forEach(function(it){ names.push(it[0] + " = " + (EX_EN[it[0]] || "") + " [" + it[1] + "]"); }); });
+  var progs = TYPE_ORDER.concat([QUICK_KEY]).map(function(k){ var t = TYPES[k]; return {id:k, nome:t.name, etapas:t.versions.length, etapa_atual:curVer(k) + 1, ciclo:(st.cycle[k] || 0) + 1, titulos:t.versions.map(function(v){ return v.title || ""; })}; });
+  var day = curDay(), cur = {programa:typeOf(st.type) ? typeOf(st.type).name : "", etapa:day.verLabel, titulo:day.stageTitle || day.title, exercicios:[]};
+  day.blocks.forEach(function(b){ b.items.forEach(function(it){ cur.exercicios.push(it[0] + " " + it[1] + (curKg(it) != null ? " @" + curKg(it) + "kg" : "")); }); });
+  var wts = {}; Object.keys(st.weights).slice(-30).forEach(function(k){ wts[k] = st.weights[k]; });
+  var today = new Date().toISOString().slice(0, 10);
+  return {hoje:today, local:LOCS[st.loc].name, programas:progs, treino_selecionado:cur,
+    ultimos_treinos:(st.log || []).slice(-6).map(function(l){ return l.date + " " + l.title + " " + l.done + "/" + l.total + " séries " + Math.round(l.sec / 60) + "min" + (l.partial ? " (terminou cedo)" : ""); }),
+    treinos_criados:Object.keys(st.custom).map(function(id){ return st.custom[id].name; }),
+    pesos_guardados:wts, proteina_hoje_g:st.prot[today] || 0, exercicios:names};
+}
+function renderChat(){
+  var el = document.getElementById("chat");
+  var h = '<div class="wrap chatwrap"><div class="top"><span class="eyebrow">Coach</span><span class="mono" style="font-size:11px;color:var(--muted)">fala comigo</span></div>';
+  h += '<div class="disp" style="font-size:40px;margin-top:10px">Pergunta-me</div>';
+  if (!st.chatCode){
+    h += '<p class="note" style="margin:10px 2px 0">Escreve o código que o Tiago te deu. Só é preciso uma vez.</p>';
+    h += '<div class="chatcode"><label class="vh" for="codeIn">Código</label><input id="codeIn" class="search" type="text" inputmode="text" autocomplete="off" placeholder="Código"><button class="main-btn" id="codeBtn" style="background:var(--green-deep);color:var(--chalk);min-height:48px">Entrar</button></div>';
+    h += '</div>'; el.innerHTML = h;
+    document.getElementById("codeBtn").addEventListener("click", function(){ var v = document.getElementById("codeIn").value.trim(); if (!v) return; st.chatCode = v; save(); renderChat(); });
+    return;
+  }
+  h += '<div class="msgs" id="msgs">';
+  if (!st.chat.length){
+    h += '<div class="msg ai"><p>Olá Diana. Pergunta-me o que quiseres sobre treino, técnica ou alimentação, ou pede-me mudanças: criar um treino, ajustar um peso, mudar de programa. Se for uma mudança na app em si, fica anotado para o Tiago.</p></div>';
+    h += '<div class="sugs">' + ["Cria-me um treino só de glúteo para hoje, 45 min","O hip thrust está leve, sobe-me o peso","Que como antes de treinar às 7h?","Hoje estou cansada, o que faço?"].map(function(t){ return '<button class="chip sug" data-sug="' + esc(t) + '">' + esc(t) + '</button>'; }).join("") + '</div>';
+  }
+  st.chat.forEach(function(m, i){
+    h += '<div class="msg ' + (m.role === "user" ? "me" : "ai") + '">' + esc(m.content).split("\n").map(function(x){ return '<p>' + x + '</p>'; }).join("") + '</div>';
+    (m.actions || []).forEach(function(a, ai){ h += actionCard(a, i, ai); });
+  });
+  if (chatBusy) h += '<div class="msg ai typing"><p>a escrever…</p></div>';
+  h += '</div>';
+  h += '<div class="chatbar"><div class="in"><label class="vh" for="chatIn">Mensagem</label><textarea id="chatIn" rows="1" placeholder="Escreve aqui…"></textarea><button id="chatSend" aria-label="Enviar"' + (chatBusy ? ' disabled' : '') + '><svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M3 10l14-6-5 14-2.5-5.5z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></button></div></div>';
+  h += '<div style="display:flex;justify-content:center;gap:8px;margin-top:10px"><button class="tech" id="chatClear" style="border-color:var(--line);color:var(--muted)">Limpar conversa</button></div>';
+  h += '</div>';
+  el.innerHTML = h;
+  var box = document.getElementById("msgs"); if (box) setTimeout(function(){ window.scrollTo(0, document.body.scrollHeight); }, 30);
+  var ta = document.getElementById("chatIn");
+  ta.addEventListener("input", function(){ ta.style.height = "auto"; ta.style.height = Math.min(140, ta.scrollHeight) + "px"; });
+  document.getElementById("chatSend").addEventListener("click", function(){ sendChat(ta.value); });
+  el.querySelectorAll("[data-sug]").forEach(function(b){ b.addEventListener("click", function(){ sendChat(b.getAttribute("data-sug")); }); });
+  el.querySelectorAll("[data-act]").forEach(function(b){ b.addEventListener("click", function(){ var p = b.getAttribute("data-act").split("."); applyAction(+p[0], +p[1]); }); });
+  document.getElementById("chatClear").addEventListener("click", function(){ st.chat = []; save(); renderChat(); });
+}
+function actionCard(a, mi, ai){
+  var done = a.applied, t = "", d = "";
+  if (a.tipo === "create_workout"){ t = "Criar treino · " + (a.nome || "O meu treino"); d = (a.exercicios || []).map(function(x){ return enShort(x.ex) + " " + x.esquema + (x.kg ? " · " + x.kg + " kg" : ""); }).join(" / "); }
+  else if (a.tipo === "set_weight"){ t = "Mudar peso"; d = enShort(a.ex || "") + " → " + a.kg + " kg"; }
+  else if (a.tipo === "set_program"){ var tt = TYPES[a.programa]; t = "Mudar programa"; d = (tt ? tt.name : a.programa) + " · etapa " + a.etapa; }
+  else if (a.tipo === "request_tiago"){ t = "Pedido para o Tiago"; d = a.texto || ""; }
+  else return "";
+  return '<div class="actc"><div><b>' + esc(t) + '</b><span>' + esc(d) + '</span></div>' + (a.tipo === "request_tiago" ? '<em>anotado</em>' : (done ? '<em>aplicado</em>' : '<button class="tech" data-act="' + mi + '.' + ai + '">Aplicar</button>')) + '</div>';
+}
+function findEx(n){
+  if (!n) return null; if (EX[n]) return n;
+  var low = String(n).toLowerCase(), hit = null;
+  Object.keys(EX).forEach(function(k){ if (!hit && (k.toLowerCase() === low || (EX_EN[k] || "").toLowerCase() === low)) hit = k; });
+  return hit || (look(EX, n) ? Object.keys(EX).filter(function(k){ return base(k) === base(n); })[0] : null);
+}
+function applyAction(mi, ai){
+  var m = st.chat[mi], a = m && m.actions && m.actions[ai]; if (!a || a.applied) return;
+  if (a.tipo === "create_workout"){
+    var items = (a.exercicios || []).map(function(x){ var n = findEx(x.ex); return n ? [n, x.esquema || "3×10", Math.max(4, Math.min(9, x.esforco || 7)), x.kg ? x.kg + " kg" : ""] : null; }).filter(Boolean);
+    if (!items.length){ toast("Não reconheci os exercícios"); return; }
+    var id = "c" + Date.now().toString(36);
+    st.custom[id] = {name:a.nome || "Treino do coach", items:items, ss:a.superseries !== false, rest:[45,60,90].indexOf(a.descanso) >= 0 ? a.descanso : 60, warm:true, stretch:true};
+    st.type = "custom:" + id; toast("Treino criado: está no início");
+  } else if (a.tipo === "set_weight"){
+    var n2 = findEx(a.ex); if (!n2 || !(a.kg >= 0)){ toast("Não reconheci o exercício"); return; }
+    st.weights[n2] = Math.round(a.kg * 10) / 10; toast(enShort(n2) + " → " + st.weights[n2] + " kg");
+  } else if (a.tipo === "set_program"){
+    if (!TYPES[a.programa]){ toast("Programa desconhecido"); return; }
+    st.type = a.programa; st.ver[a.programa] = Math.max(0, Math.min(TYPES[a.programa].versions.length - 1, (a.etapa || 1) - 1)); toast("Programa mudado");
+  }
+  a.applied = true; save(); renderChat();
+}
+function sendChat(text){
+  text = String(text || "").trim(); if (!text || chatBusy) return;
+  st.chat.push({role:"user", content:text}); if (st.chat.length > 60) st.chat = st.chat.slice(-60);
+  chatBusy = true; save(); renderChat();
+  var msgs = st.chat.filter(function(m){ return !m.err; }).slice(-12).map(function(m){ return {role:m.role, content:m.content}; });
+  fetch("/api/chat", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({code:st.chatCode, messages:msgs, ctx:chatCtx()})})
+    .then(function(r){ return r.json().then(function(j){ return {ok:r.ok, status:r.status, j:j}; }); })
+    .then(function(o){
+      chatBusy = false;
+      if (!o.ok){ if (o.status === 401){ st.chatCode = ""; } st.chat.push({role:"assistant", content:(o.j && o.j.error) || "Erro. Tenta outra vez.", err:true}); save(); renderChat(); return; }
+      var acts = (o.j.actions || []).filter(function(a){ return a && a.tipo; });
+      acts.forEach(function(a){ if (a.tipo === "request_tiago" && a.texto){ st.requests.push({date:new Date().toISOString().slice(0, 10), text:a.texto}); } });
+      st.chat.push({role:"assistant", content:o.j.reply || "", actions:acts}); save(); renderChat();
+    })
+    .catch(function(){ chatBusy = false; st.chat.push({role:"assistant", content:"Sem internet. Tenta outra vez quando tiveres rede.", err:true}); save(); renderChat(); });
+}
+
 /* ---------- PERFIL ---------- */
 function renderProfile(){
   var ws = weekStats(), nTypes = TYPE_ORDER.length, nWork = 0; TYPE_ORDER.forEach(function(k){ nWork += TYPES[k].versions.length; });
@@ -2060,6 +2224,11 @@ function renderProfile(){
     h += '<button class="wrow" data-log="' + ((st.log.length - 1) - i) + '"><span class="n">' + esc(fmtDate(l.date)) + '</span><span><span class="tt">' + esc(l.title) + ' · ' + esc(l.ver || "") + '</span><div class="tags">' + esc(LOCS[l.loc] ? LOCS[l.loc].name : "") + ' · ' + l.done + '/' + l.total + ' séries' + (l.partial ? ' · terminado mais cedo' : '') + '</div></span><span class="mn">' + Math.round(l.sec / 60) + '′</span></button>';
   });
   h += '</div>';
+  if ((st.requests || []).length){
+    h += '<div class="sec-h"><h2>Pedidos ao Tiago</h2><span class="mono" style="font-size:11px;color:var(--muted)">' + st.requests.length + '</span></div><div class="ncards">';
+    st.requests.slice(-10).reverse().forEach(function(q){ h += '<div class="ncard"><b style="font-size:12px;font-family:var(--mono);color:var(--muted)">' + esc(fmtDate(q.date)) + '</b><p>' + esc(q.text) + '</p></div>'; });
+    h += '</div>';
+  }
   h += '<div class="sec-h"><h2>Como funciona</h2></div>';
   h += '<div class="rules"><div class="r"><span class="eyebrow">Treinos</span><span>' + nTypes + ' programas × 5 etapas = <b>' + nWork + ' treinos diferentes</b>, cada um adaptado ao local. Mais o Rápido 20′ e os que criares.</span></div>';
   h += '<div class="r"><span class="eyebrow">Etapas</span><span>Escolhes um programa e fazes as 5 etapas por ordem. A app avança sozinha quando terminas cada uma. No fim da 5 recomeça (ciclo 2, 3…) e os pesos vão subindo. Podes trocar de programa quando quiseres; cada um guarda onde ficaste.</span></div>';
@@ -2132,6 +2301,7 @@ function addProt(v){
   var keys = Object.keys(st.prot).sort(); if (keys.length > 60) keys.slice(0, keys.length - 60).forEach(function(k){ delete st.prot[k]; });
   save(); renderNutri(); toast(v === "reset" ? "Contador reposto" : "+" + v + " g de proteína");
 }
+function recImg(r, w){ return r.img ? "https://images.unsplash.com/photo-" + r.img + "?auto=format&fit=crop&w=" + w + "&q=70" : ""; }
 function renderNutri(){
   var h = '<div class="wrap"><div class="top"><span class="eyebrow">Nutrição</span><span class="mono" style="font-size:11px;color:var(--muted)">' + NUTRI.recipes.length + ' receitas</span></div>';
   h += '<div class="disp" style="font-size:40px;margin-top:10px">Comer para treinar</div>';
@@ -2161,9 +2331,10 @@ function renderNutri(){
       if (ui.nmeal && r.m !== ui.nmeal) return;
       if (q && r.n.toLowerCase().indexOf(q) < 0 && !r.ing.some(function(x){ return x.toLowerCase().indexOf(q) >= 0; })) return;
       any = true; var ml = NUTRI.meals.filter(function(m){ return m[0] === r.m; })[0];
-      h += '<button class="rcard" data-rec="' + i + '"><span class="ic">' + MEAL_ICON[r.m] + '</span><span><div class="nm">' + esc(r.n) + '</div><div class="mu">' + esc(ml ? ml[1] : "") + ' · ' + r.min + ' min</div></span><span class="kc"><b>' + r.prot + ' g prot.</b>~' + r.kcal + ' kcal</span></button>';
+      h += '<button class="rcard" data-rec="' + i + '"><span class="ic">' + MEAL_ICON[r.m] + (r.img ? '<img src="' + recImg(r, 200) + '" alt="" loading="lazy" onerror="this.remove()">' : '') + '</span><span><div class="nm">' + esc(r.n) + '</div><div class="mu">' + esc(ml ? ml[1] : "") + ' · ' + r.min + ' min</div></span><span class="kc"><b>' + r.prot + ' g prot.</b>~' + r.kcal + ' kcal</span></button>';
     });
     if (!any) h += '<p class="empty">Nenhuma receita com isso.</p>';
+    h += '<p class="note" style="margin:14px 2px 0;font-size:11px">Fotos: Unsplash.</p>';
     h += '</div>';
   } else {
     var sec = NUTRI.sections.filter(function(x){ return x.key === ui.nsec; })[0] || NUTRI.sections[0];
@@ -2185,7 +2356,8 @@ function openRecipe(i){
   var ml = NUTRI.meals.filter(function(m){ return m[0] === r.m; })[0];
   var h = '<div class="pan light" role="dialog" aria-modal="true" aria-label="' + esc(r.n) + '">';
   h += '<div class="grab"><span class="eyebrow" style="color:var(--muted)">' + esc(ml ? ml[1] : "") + ' · ' + r.min + ' min</span>' + CLOSE_BTN + '</div>';
-  h += '<div class="disp" style="font-size:36px;margin-top:6px">' + esc(r.n) + '</div>';
+  if (r.img) h += '<div class="rphoto"><img src="' + recImg(r, 900) + '" alt="' + esc(r.n) + '" onerror="this.parentNode.remove()"></div>';
+  h += '<div class="disp" style="font-size:36px;margin-top:10px">' + esc(r.n) + '</div>';
   h += '<div class="tiles"><div class="tile"><span>PROTEÍNA</span><b>' + r.prot + ' g</b></div><div class="tile"><span>CALORIAS</span><b>~' + r.kcal + '</b></div><div class="tile"><span>TEMPO</span><b>' + r.min + '′</b></div></div>';
   h += '<div class="rowsx"><div class="rx"><span class="eyebrow">Precisas</span><span><ul class="rlist" style="margin-top:0">' + r.ing.map(function(x){ return '<li>' + esc(x) + '</li>'; }).join("") + '</ul></span></div>';
   h += '<div class="rx"><span class="eyebrow">Como</span><span><ol class="rsteps" style="margin-top:0">' + r.st.map(function(x){ return '<li>' + esc(x) + '</li>'; }).join("") + '</ol></span></div></div>';
@@ -2942,17 +3114,20 @@ function setTab(t){
   document.getElementById("lib").hidden = t !== "lib";
   document.getElementById("nutri").hidden = t !== "nutri";
   document.getElementById("profile").hidden = t !== "profile";
+  document.getElementById("chat").hidden = t !== "chat";
+  document.getElementById("tabChat").setAttribute("aria-current", t === "chat" ? "page" : "false");
   document.getElementById("tabProfile").setAttribute("aria-current", t === "profile" ? "page" : "false");
   document.getElementById("tabHome").setAttribute("aria-current", t === "home" ? "page" : "false");
   document.getElementById("tabLib").setAttribute("aria-current", t === "lib" ? "page" : "false");
   document.getElementById("tabNutri").setAttribute("aria-current", t === "nutri" ? "page" : "false");
-  if (t === "lib") renderLib(); else if (t === "nutri") renderNutri(); else if (t === "profile") renderProfile(); else renderHome();
+  if (t === "lib") renderLib(); else if (t === "nutri") renderNutri(); else if (t === "profile") renderProfile(); else if (t === "chat") renderChat(); else renderHome();
   window.scrollTo(0, 0);
 }
 document.getElementById("tabHome").addEventListener("click", function(){ setTab("home"); });
 document.getElementById("tabLib").addEventListener("click", function(){ setTab("lib"); });
 document.getElementById("tabNutri").addEventListener("click", function(){ setTab("nutri"); });
 document.getElementById("tabProfile").addEventListener("click", function(){ setTab("profile"); });
+document.getElementById("tabChat").addEventListener("click", function(){ setTab("chat"); });
 document.addEventListener("keydown", function(e){ if (e.key === "Escape" && !document.getElementById("sheet").hidden) closeSheet(); });
 
 renderHome();
