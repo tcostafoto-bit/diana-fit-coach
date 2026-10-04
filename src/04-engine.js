@@ -461,6 +461,11 @@ function renderChat(){
     document.getElementById("codeBtn").addEventListener("click", function(){ var v = document.getElementById("codeIn").value.trim(); if (!v) return; st.chatCode = v; save(); renderChat(); });
     return;
   }
+  if (ui.pedidos && ui.pedidos.length){
+    h += '<details class="peds"' + (ui.pedidosOpen ? ' open' : '') + '><summary><span>Pedidos de mudança na app</span><span class="mono">' + ui.pedidos.filter(function(p){ return p.estado !== "feito"; }).length + ' em curso · ' + ui.pedidos.filter(function(p){ return p.estado === "feito"; }).length + ' feitos</span></summary>';
+    ui.pedidos.forEach(function(p){ h += '<div class="ped"><div class="ph"><b>' + esc(p.titulo) + '</b><span class="pst ' + (p.estado === "feito" ? 'ok' : '') + '">' + esc(p.estado) + '</span></div>' + (p.resposta ? '<p>' + esc(p.resposta).replace(/\n/g, '<br>') + '</p>' : '') + '</div>'; });
+    h += '<p class="note" style="font-size:11.5px;margin:6px 0 0">Quando um pedido fica "feito", fecha e volta a abrir a app para veres a mudança.</p></details>';
+  }
   h += '<div class="msgs" id="msgs">';
   if (!st.chat.length){
     h += '<div class="msg ai"><p>Olá Diana. Pergunta-me o que quiseres sobre treino, técnica ou alimentação, ou pede-me mudanças: criar um treino, ajustar um peso, mudar de programa. Se for uma mudança na app em si, fica anotado para o Tiago.</p></div>';
@@ -483,15 +488,17 @@ function renderChat(){
   el.querySelectorAll("[data-sug]").forEach(function(b){ b.addEventListener("click", function(){ sendChat(b.getAttribute("data-sug")); }); });
   el.querySelectorAll("[data-act]").forEach(function(b){ b.addEventListener("click", function(){ var p = b.getAttribute("data-act").split("."); applyAction(+p[0], +p[1]); }); });
   document.getElementById("chatClear").addEventListener("click", function(){ st.chat = []; save(); renderChat(); });
+  var pd = el.querySelector(".peds"); if (pd) pd.addEventListener("toggle", function(){ ui.pedidosOpen = pd.open; });
+  if (!ui.pedidosAt || Date.now() - ui.pedidosAt > 60000) loadPedidos();
 }
 function actionCard(a, mi, ai){
   var done = a.applied, t = "", d = "";
   if (a.tipo === "create_workout"){ t = "Criar treino · " + (a.nome || "O meu treino"); d = (a.exercicios || []).map(function(x){ return enShort(x.ex) + " " + x.esquema + (x.kg ? " · " + x.kg + " kg" : ""); }).join(" / "); }
   else if (a.tipo === "set_weight"){ t = "Mudar peso"; d = enShort(a.ex || "") + " → " + a.kg + " kg"; }
   else if (a.tipo === "set_program"){ var tt = TYPES[a.programa]; t = "Mudar programa"; d = (tt ? tt.name : a.programa) + " · etapa " + a.etapa; }
-  else if (a.tipo === "request_tiago"){ t = "Pedido para o Tiago"; d = a.texto || ""; }
+  else if (a.tipo === "request_tiago"){ t = a.issue ? "Pedido de mudança na app · #" + a.issue : "Pedido para o Tiago"; d = a.texto || ""; }
   else return "";
-  return '<div class="actc"><div><b>' + esc(t) + '</b><span>' + esc(d) + '</span></div>' + (a.tipo === "request_tiago" ? '<em>anotado</em>' : (done ? '<em>aplicado</em>' : '<button class="tech" data-act="' + mi + '.' + ai + '">Aplicar</button>')) + '</div>';
+  return '<div class="actc"><div><b>' + esc(t) + '</b><span>' + esc(d) + '</span></div>' + (a.tipo === "request_tiago" ? '<em>' + (a.issue ? 'na fila' : 'anotado') + '</em>' : (done ? '<em>aplicado</em>' : '<button class="tech" data-act="' + mi + '.' + ai + '">Aplicar</button>')) + '</div>';
 }
 function findEx(n){
   if (!n) return null; if (EX[n]) return n;
@@ -516,6 +523,15 @@ function applyAction(mi, ai){
   }
   a.applied = true; save(); renderChat();
 }
+function loadPedidos(){
+  ui.pedidosAt = Date.now();
+  if (!st.chatCode) return;
+  fetch("/api/pedidos?code=" + encodeURIComponent(st.chatCode)).then(function(r){ return r.ok ? r.json() : null; }).then(function(j){
+    if (!j || !j.pedidos) return;
+    var before = JSON.stringify(ui.pedidos || []); ui.pedidos = j.pedidos;
+    if (before !== JSON.stringify(ui.pedidos) && ui.tab === "chat" && !document.getElementById("chatIn").value) renderChat();
+  }).catch(function(){});
+}
 function sendChat(text){
   text = String(text || "").trim(); if (!text || chatBusy) return;
   st.chat.push({role:"user", content:text}); if (st.chat.length > 60) st.chat = st.chat.slice(-60);
@@ -528,7 +544,9 @@ function sendChat(text){
       if (!o.ok){ if (o.status === 401){ st.chatCode = ""; } st.chat.push({role:"assistant", content:(o.j && o.j.error) || "Erro. Tenta outra vez.", err:true}); save(); renderChat(); return; }
       var acts = (o.j.actions || []).filter(function(a){ return a && a.tipo; });
       acts.forEach(function(a){ if (a.tipo === "request_tiago" && a.texto){ st.requests.push({date:new Date().toISOString().slice(0, 10), text:a.texto}); } });
-      st.chat.push({role:"assistant", content:o.j.reply || "", actions:acts}); save(); renderChat();
+      st.chat.push({role:"assistant", content:o.j.reply || "", actions:acts});
+      if (acts.some(function(a){ return a.issue; })) ui.pedidosAt = 0;
+      save(); renderChat();
     })
     .catch(function(){ chatBusy = false; st.chat.push({role:"assistant", content:"Sem internet. Tenta outra vez quando tiveres rede.", err:true}); save(); renderChat(); });
 }

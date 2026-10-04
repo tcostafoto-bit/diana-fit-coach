@@ -14,7 +14,7 @@ O que podes fazer por ela (através de "acoes", que ela confirma com um botão a
 - create_workout: criar um treino novo dela. Usa APENAS nomes de exercícios EXATAMENTE como aparecem na lista "exercicios" do contexto (copia o nome português tal e qual). Esquema como "4×10", "3×12/lado", "3×40s", "1×5 min". Esforço 5-9. Peso em kg só se fizer sentido. Normalmente 4 a 8 exercícios, em pares para superséries.
 - set_weight: mudar o peso de referência de um exercício (nome exato da lista).
 - set_program: escolher programa e etapa (ids e número de etapas vêm no contexto; etapa é 1-5).
-- request_tiago: quando ela pede algo que muda a app em si (design, novas funções, novos programas fixos, erros), regista o pedido para o Tiago com um resumo claro e diz-lhe que ficou anotado.
+- request_tiago: quando ela pede algo que muda a app em si (design, cores, ecrãs, novas funções, novos programas fixos, novas receitas, corrigir erros), cria um pedido de mudança. Escreve em "texto" um pedido completo e claro para um programador: o que ela quer, onde na app, e exemplos concretos do que ela disse. Diz-lhe que o pedido foi para a fila e que normalmente fica feito em menos de uma hora; quando estiver pronto aparece como "feito" aqui no Coach e basta fechar e reabrir a app. Antes de criar o pedido, se faltar algo essencial (ex.: "muda as cores" sem dizer para quê), pergunta primeiro.
 
 Regras: se ela falar de dor aguda, lesão, tonturas, gravidez ou condição médica, diz-lhe para parar e falar com um profissional de saúde; não dês diagnósticos. Nutrição só orientação geral, sem planos de restrição agressiva. Não inventes funcionalidades da app que não existem. Se não precisares de nenhuma ação, deixa "acoes" vazio. Responde sempre através da ferramenta "responder".`;
 
@@ -59,6 +59,21 @@ const TOOL = {
   }
 };
 
+const REPO = process.env.GITHUB_REPO || "tcostafoto-bit/diana-fit-coach";
+async function createIssue(text) {
+  const tok = process.env.GITHUB_TOKEN; if (!tok) return null;
+  try {
+    const title = "Pedido da Diana: " + clip(String(text).split("\n")[0], 80);
+    const r = await fetch("https://api.github.com/repos/" + REPO + "/issues", {
+      method: "POST",
+      headers: { "Authorization": "Bearer " + tok, "Accept": "application/vnd.github+json", "Content-Type": "application/json", "User-Agent": "diana-fit-coach" },
+      body: JSON.stringify({ title, body: clip(text, 6000) + "\n\n---\nPedido feito pela Diana no Coach da app.", labels: ["pedido-diana"] })
+    });
+    if (!r.ok) return null;
+    return await r.json();
+  } catch (e) { return null; }
+}
+
 function clip(s, n) { s = String(s == null ? "" : s); return s.length > n ? s.slice(0, n) : s; }
 
 module.exports = async function handler(req, res) {
@@ -100,7 +115,14 @@ module.exports = async function handler(req, res) {
     const tu = (data.content || []).find(c => c.type === "tool_use");
     const txt = (data.content || []).filter(c => c.type === "text").map(c => c.text).join("\n");
     const out = tu && tu.input ? tu.input : { resposta: txt || "Não consegui responder, tenta outra vez.", acoes: [] };
-    res.status(200).json({ reply: clip(out.resposta, 4000), actions: Array.isArray(out.acoes) ? out.acoes.slice(0, 5) : [] });
+    const actions = Array.isArray(out.acoes) ? out.acoes.slice(0, 5) : [];
+    for (const a of actions) {
+      if (a && a.tipo === "request_tiago" && a.texto) {
+        const issue = await createIssue(a.texto);
+        if (issue) { a.issue = issue.number; a.url = issue.html_url; }
+      }
+    }
+    res.status(200).json({ reply: clip(out.resposta, 4000), actions });
   } catch (e) {
     res.status(502).json({ error: "Sem ligação ao coach. Tenta outra vez." });
   }
