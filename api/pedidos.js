@@ -20,7 +20,7 @@ module.exports = async function handler(req, res) {
           if (c.ok) { const cs = await c.json(); const last = cs[cs.length - 1]; resposta = last ? String(last.body || "").slice(0, 1500) : ""; }
         } catch (e) {}
       }
-      out.push({ n: i.number, titulo: String(i.title || "").replace(/^Pedido da Diana:\s*/, ""), estado: i.state === "closed" ? "feito" : (resposta ? "em curso" : "em fila"), criado: String(i.created_at || "").slice(0, 10), resposta });
+      out.push({ n: i.number, titulo: String(i.title || "").replace(/^Pedido da Diana:\s*/, ""), estado: i.state === "closed" ? "feito" : (resposta ? "em curso" : "em fila"), criado: String(i.created_at || "").slice(0, 10), resposta, avisado: (i.labels || []).some(l => l.name === "urgente") });
     }
     res.status(200).json({ pedidos: out });
   } catch (e) { res.status(502).json({ error: "Sem ligação." }); }

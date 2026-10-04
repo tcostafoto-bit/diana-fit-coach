@@ -463,7 +463,7 @@ function renderChat(){
   }
   if (ui.pedidos && ui.pedidos.length){
     h += '<details class="peds"' + (ui.pedidosOpen ? ' open' : '') + '><summary><span>Pedidos de mudança na app</span><span class="mono">' + ui.pedidos.filter(function(p){ return p.estado !== "feito"; }).length + ' em curso · ' + ui.pedidos.filter(function(p){ return p.estado === "feito"; }).length + ' feitos</span></summary>';
-    ui.pedidos.forEach(function(p){ h += '<div class="ped"><div class="ph"><b>' + esc(p.titulo) + '</b><span class="pst ' + (p.estado === "feito" ? 'ok' : '') + '">' + esc(p.estado) + '</span></div>' + (p.resposta ? '<p>' + esc(p.resposta).replace(/\n/g, '<br>') + '</p>' : '') + '</div>'; });
+    ui.pedidos.forEach(function(p){ h += '<div class="ped"><div class="ph"><b>' + esc(p.titulo) + '</b><span class="pst ' + (p.estado === "feito" ? 'ok' : '') + '">' + esc(p.estado) + '</span></div>' + (p.resposta ? '<p>' + esc(p.resposta).replace(/\n/g, '<br>') + '</p>' : '') + (p.estado !== "feito" ? (p.avisado ? '<div class="pav done">Tiago avisado</div>' : '<button class="pav" data-n="' + p.n + '">Avisar o Tiago para fazer já</button>') : '') + '</div>'; });
     h += '<p class="note" style="font-size:11.5px;margin:6px 0 0">Quando um pedido fica "feito", fecha e volta a abrir a app para veres a mudança.</p></details>';
   }
   h += '<div class="msgs" id="msgs">';
@@ -489,6 +489,15 @@ function renderChat(){
   el.querySelectorAll("[data-act]").forEach(function(b){ b.addEventListener("click", function(){ var p = b.getAttribute("data-act").split("."); applyAction(+p[0], +p[1]); }); });
   document.getElementById("chatClear").addEventListener("click", function(){ st.chat = []; save(); renderChat(); });
   var pd = el.querySelector(".peds"); if (pd) pd.addEventListener("toggle", function(){ ui.pedidosOpen = pd.open; });
+  el.querySelectorAll("button.pav").forEach(function(b){ b.addEventListener("click", function(){
+    var n = +b.getAttribute("data-n"); b.disabled = true; b.textContent = "A avisar…";
+    fetch("/api/avisar", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({code: st.chatCode, n: n})})
+      .then(function(r){ return r.json().then(function(j){ return {ok: r.ok, j: j}; }); })
+      .then(function(x){
+        if (x.ok){ (ui.pedidos || []).forEach(function(p){ if (p.n === n) p.avisado = true; }); ui.pedidosOpen = true; renderChat(); }
+        else { b.disabled = false; b.textContent = (x.j && x.j.error) || "Não deu, tenta outra vez"; }
+      }).catch(function(){ b.disabled = false; b.textContent = "Sem ligação, tenta outra vez"; });
+  }); });
   if (!ui.pedidosAt || Date.now() - ui.pedidosAt > 60000) loadPedidos();
 }
 function actionCard(a, mi, ai){
