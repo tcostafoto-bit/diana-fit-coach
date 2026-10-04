@@ -61,7 +61,7 @@ const TOOL = {
 
 const REPO = process.env.GITHUB_REPO || "tcostafoto-bit/diana-fit-coach";
 async function createIssue(text) {
-  const tok = process.env.GITHUB_TOKEN; if (!tok) return { err: "sem token" };
+  const tok = (process.env.GITHUB_TOKEN || process.env.github_token); if (!tok) return { err: "sem token" };
   try {
     const title = "Pedido da Diana: " + clip(String(text).split("\n")[0], 80);
     const r = await fetch("https://api.github.com/repos/" + REPO + "/issues", {

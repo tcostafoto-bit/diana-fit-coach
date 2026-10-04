@@ -6,7 +6,7 @@ module.exports = async function handler(req, res) {
   const code = String((req.query && req.query.code) || "").trim();
   if (!pass || code !== String(pass).trim()) { res.status(401).json({ error: "Código errado." }); return; }
   const h = { "Accept": "application/vnd.github+json", "User-Agent": "diana-fit-coach" };
-  if (process.env.GITHUB_TOKEN) h.Authorization = "Bearer " + process.env.GITHUB_TOKEN;
+  if ((process.env.GITHUB_TOKEN || process.env.github_token)) h.Authorization = "Bearer " + (process.env.GITHUB_TOKEN || process.env.github_token);
   try {
     const r = await fetch("https://api.github.com/repos/" + REPO + "/issues?labels=pedido-diana&state=all&per_page=20&sort=created&direction=desc", { headers: h });
     if (!r.ok) { res.status(502).json({ error: "Não consegui ver os pedidos." }); return; }
